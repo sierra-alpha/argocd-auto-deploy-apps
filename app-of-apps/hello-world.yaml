@@ -7,12 +7,13 @@ metadata:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
+    namespace: default
     server: https://kubernetes.default.svc
   project: default
   source:
+    path: hello-world
     repoURL: https://github.com/sierra-alpha/agrocd-auto-deploy-apps
     targetRevision: HEAD
-    path: hello-world
   syncPolicy:
     automated:
       prune: true
