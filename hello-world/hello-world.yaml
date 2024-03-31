@@ -19,7 +19,7 @@ metadata:
     kubernetes.io/ingress.class: "traefik"
 spec:
   rules:
-  - host: hello-world.app.sierra-alpha.co.nz
+  - host: hello-world.app.sierraalpha.co.nz
 ---
 apiVersion: v1
 kind: Service
