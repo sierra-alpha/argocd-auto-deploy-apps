@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: hello-world-configmap
+data:
+  index.html: |
+    <html>
+      <head>
+        <title>Hello World!</title>
+      </head>
+      <body>Hello World!</body>
+    </html>
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -55,5 +67,5 @@ spec:
       volumes:
       - name: hello-world-volume
         configMap:
-          name: hello-world
+          name: hello-world-configmap
 
