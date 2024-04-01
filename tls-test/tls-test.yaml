@@ -13,13 +13,13 @@ spec:
   - host: tls-test.app.sierraalpha.co.nz
     http:
       paths:
-      - backend:
+      - pathType: Prefix
+        path: /
+        backend:
           service:
             name: tls-test
             port:
               number: 80
-        path: /
-        pathType: Prefix
   tls:
   - hosts:
     - tls-test.app.sierraalpha.co.nz
