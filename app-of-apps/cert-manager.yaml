@@ -11,10 +11,14 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: releases/download/v1.14.4/cert-manager.yaml
-    repoURL: https://github.com/cert-manager/cert-manager
-    targetRevision: HEAD
+    chart: jetstack/cert-manager
+    repoURL: https://charts.jetstack.io
+    helm:
+      valuesObject:
+        installCRDs: true
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
