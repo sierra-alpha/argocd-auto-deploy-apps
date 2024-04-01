@@ -16,26 +16,26 @@ kind: ServiceAccount
 metadata:
   name: acme-copy-token-role
   namespace: cert-manager
----
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: acme-token-copy-cron
-  namespace: cert-manager
-spec:
-  schedule: "*/20 8-19 * * 1-5"
-  concurrencyPolicy: Forbid
-  jobTemplate:
-    spec:
-      template:
-        metadata:
-          labels:
-            app: well
-        spec:
-          containers:
-            - name: acme-token-copy-job
-              serviceAccountName: acme-copy-token-role
-              image: acme-token-s3-upload
-                imagePullPolicy: IfNotPresent
-              restartPolicy: OnFailure
+#---
+#apiVersion: batch/v1beta1
+#kind: CronJob
+#metadata:
+#  name: acme-token-copy-cron
+#  namespace: cert-manager
+#spec:
+#  schedule: "*/20 8-19 * * 1-5"
+#  concurrencyPolicy: Forbid
+#  jobTemplate:
+#    spec:
+#      template:
+#        metadata:
+#          labels:
+#            app: well
+#        spec:
+#          containers:
+#            - name: acme-token-copy-job
+#              serviceAccountName: acme-copy-token-role
+#              image: acme-token-s3-upload
+#                imagePullPolicy: IfNotPresent
+#              restartPolicy: OnFailure
 
