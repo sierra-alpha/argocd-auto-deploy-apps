@@ -46,9 +46,11 @@ spec:
         spec:
           serviceAccountName: acme-copy-token-role
           restartPolicy: Never
+          serviceAccountName: acme-copy-token-role
           containers:
           - name: acme-token-cloud-copy-job
             image: rclone/rclone
+            command: ["ls", "/data"]
             volumeMounts:
             - name: data-dir
               mountPath: /data
@@ -56,7 +58,7 @@ spec:
           - name: token-file-writer
             image: bitnami/kubectl
             command: ["/usr/bin/bash"]
-            args:  ["--", "/scripts/make-token-files.sh"]
+            args: ["--", "/scripts/make-token-files.sh"]
             env:
             - name: UPLOAD_LOCATION
               value: /data
