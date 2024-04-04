@@ -16,26 +16,76 @@ kind: ServiceAccount
 metadata:
   name: acme-copy-token-role
   namespace: cert-manager
-#---
-#apiVersion: batch/v1beta1
-#kind: CronJob
-#metadata:
-#  name: acme-token-copy-cron
-#  namespace: cert-manager
-#spec:
-#  schedule: "*/20 8-19 * * 1-5"
-#  concurrencyPolicy: Forbid
-#  jobTemplate:
-#    spec:
-#      template:
-#        metadata:
-#          labels:
-#            app: well
-#        spec:
-#          containers:
-#            - name: acme-token-copy-job
-#              serviceAccountName: acme-copy-token-role
-#              image: acme-token-s3-upload
-#                imagePullPolicy: IfNotPresent
-#              restartPolicy: OnFailure
-
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: token-files-cm
+data:
+  make-token-files.sh: |
+    kubectl get challenges -o jsonpath='{.items[].spec.token} {.items[].spec.key}' \
+      | while read -r token-and-key; do
+          echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: acme-token-cloud-copy-cron
+  namespace: cert-manager
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: well-known-acme-token-cloud-copy
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: acme-token-cloud-copy-job
+            image: rclone/rclone
+            volumeMounts:
+            - name: data-dir
+              mountPath: /data
+          initContainers:
+          - name: token-file-writer
+            serviceAccountName: acme-copy-token-role
+            image: bitnami/kubectl
+            command: ["/usr/bin/bash"]
+            args:  ["--" "/scripts/make-token-files.sh"]
+            env:
+            - name: UPLOAD_LOCATION
+              value: /data
+            volumeMounts:
+            - name: data-dir
+              mountPath: /data
+            - name: script-dir
+              mountPath: /script
+          volumes:
+          - name: data-dir
+            emptyDir: {}
+          - name: script-dir
+            configMap:
+              name: token-files-cm
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+ name: acme-token-cloud-cleanup-cron
+ namespace: cert-manager
+spec:
+ schedule: "0 0 * * 1"
+ concurrencyPolicy: Forbid
+ jobTemplate:
+   spec:
+     template:
+       metadata:
+         labels:
+           app: well
+       spec:
+         containers:
+         - name: acme-token-cleanup-job
+           image: rclone/rclone
+           restartPolicy: OnFailure
