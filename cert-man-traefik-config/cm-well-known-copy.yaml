@@ -26,7 +26,8 @@ data:
     kubectl get challenges \
     -o jsonpath='{.items[].spec.token} {.items[].spec.key}' \
       | while read -r token-and-key; do
-          echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
+        echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
+      done
 ---
 apiVersion: batch/v1
 kind: CronJob
