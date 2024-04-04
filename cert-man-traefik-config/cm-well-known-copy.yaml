@@ -26,10 +26,10 @@ metadata:
 
 data:
   make_token_files.sh: |
-    kubectl get challenges -o jsonpath='{.items[].spec.token} {.items[].spec.key}' | while read -r token-and-key
-    do
-      echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
-    done
+    kubectl get challenges \
+    -o jsonpath='{.items[].spec.token} {.items[].spec.key}' \
+      | while read -r token-and-key; do
+          echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
 ---
 apiVersion: batch/v1
 kind: CronJob
