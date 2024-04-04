@@ -25,7 +25,7 @@ metadata:
 
 
 data:
-  make_token_files.sh: |
+  make-token-files.sh: |
     kubectl get challenges \
     -o jsonpath='{.items[].spec.token} {.items[].spec.key}' \
       | while read -r token-and-key; do
