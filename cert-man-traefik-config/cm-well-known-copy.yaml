@@ -21,13 +21,17 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: token-files-cm
+
+
+
 data:
-  make-token-files.sh: |
-    kubectl get challenges -o jsonpath='{.items[].spec.token} {.items[].spec.key}' \
-      | while read -r token-and-key; do
-          echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
+  make_token_files.sh: |
+    kubectl get challenges -o jsonpath='{.items[].spec.token} {.items[].spec.key}' | while read -r token-and-key
+    do
+      echo "$token-and-key[1]" > "$UPLOAD_LOCATION/$token-and-key[0]"
+    done
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: acme-token-cloud-copy-cron
@@ -42,6 +46,7 @@ spec:
           labels:
             app: well-known-acme-token-cloud-copy
         spec:
+          serviceAccountName: acme-copy-token-role
           restartPolicy: Never
           containers:
           - name: acme-token-cloud-copy-job
@@ -51,10 +56,9 @@ spec:
               mountPath: /data
           initContainers:
           - name: token-file-writer
-            serviceAccountName: acme-copy-token-role
             image: bitnami/kubectl
             command: ["/usr/bin/bash"]
-            args:  ["--" "/scripts/make-token-files.sh"]
+            args:  ["--", "/scripts/make-token-files.sh"]
             env:
             - name: UPLOAD_LOCATION
               value: /data
@@ -70,7 +74,7 @@ spec:
             configMap:
               name: token-files-cm
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
  name: acme-token-cloud-cleanup-cron
@@ -85,7 +89,7 @@ spec:
          labels:
            app: well
        spec:
+         restartPolicy: OnFailure
          containers:
          - name: acme-token-cleanup-job
            image: rclone/rclone
-           restartPolicy: OnFailure
