@@ -23,11 +23,19 @@ metadata:
   name: token-files-cm
 data:
   make-token-files.sh: |
-    kubectl get challenges \
-    -o jsonpath='{.items[].spec.token} {.items[].spec.key}' \
-      | while read -r token_and_key; do
-        echo "$token_and_key[1]" > "$UPLOAD_LOCATION/$token_and_key[0]"
-      done
+    kubectl get challenges -o json \
+      | jq '
+          [
+            .items[].spec.token,
+            .items[].spec.key
+          ]
+          |select(. != [])
+          | join(" ")
+        ' \
+      | while read -r token_and_key
+        do
+          echo "$token_and_key[1]" > "$UPLOAD_LOCATION/$token_and_key[0]"
+        done
 ---
 apiVersion: batch/v1
 kind: CronJob
