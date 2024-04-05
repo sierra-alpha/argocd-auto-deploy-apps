@@ -58,7 +58,7 @@ spec:
           containers:
           - name: acme-token-cloud-copy-job
             image: rclone/rclone
-            command: ["ls", "/data"]
+            command: ["ls", "/"]
             volumeMounts:
             - name: data-dir
               mountPath: /data
