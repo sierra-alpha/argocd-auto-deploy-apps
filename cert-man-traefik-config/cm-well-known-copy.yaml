@@ -17,6 +17,14 @@ metadata:
   name: acme-copy-token-role
   namespace: cert-manager
 ---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: public-upload-rclone-config
+spec:
+  itemPath:
+    "vaults/K8s Service Account/items/rclone-config-upload-cc-public"
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -34,7 +42,7 @@ data:
         ' \
       | while read -r token_and_key
         do
-          echo "$token_and_key[1]" > "$UPLOAD_LOCATION/$token_and_key[0]"
+          echo "$token_and_key[1]" > "$STAGING_LOCATION/$token_and_key[0]"
         done
 ---
 apiVersion: batch/v1
@@ -54,21 +62,31 @@ spec:
         spec:
           serviceAccountName: acme-copy-token-role
           restartPolicy: Never
-          serviceAccountName: acme-copy-token-role
           containers:
           - name: acme-token-cloud-copy-job
             image: rclone/rclone
-            command: ["ls", "/"]
+            args:
+            - '--config=/.config/rclone/rclone.conf'
+            - 'copy'
+            - '$STAGING_LOCATION'
+            - 'cc-public:$UPLOAD_LOCATION'
+            env:
+            - name: STAGING_LOCATION
+              value: /data
+            - name: UPLOAD_LOCATION
+              value: .well-known/acme-challenge
             volumeMounts:
             - name: data-dir
               mountPath: /data
+            - name: rclone-conf-dir
+              mountPath: /.config/rclone
           initContainers:
           - name: token-file-writer
             image: bitnami/kubectl
             command: ["/usr/bin/bash"]
             args: ["--", "/scripts/make-token-files.sh"]
             env:
-            - name: UPLOAD_LOCATION
+            - name: STAGING_LOCATION
               value: /data
             volumeMounts:
             - name: data-dir
@@ -81,6 +99,9 @@ spec:
           - name: script-dir
             configMap:
               name: token-files-cm
+          - name: rclone-conf-dir
+            secret:
+              secretName: public-upload-rclone-config
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -95,9 +116,23 @@ spec:
      template:
        metadata:
          labels:
-           app: well
+           app: well-known-acme-token-cloud-delete
        spec:
-         restartPolicy: OnFailure
+         restartPolicy: Never
          containers:
-         - name: acme-token-cleanup-job
+         - name: acme-token-cloud-delete-job
            image: rclone/rclone
+           args:
+           - '--config=/.config/rclone/rclone.conf'
+           - 'delete'
+           - 'cc-public:$UPLOAD_LOCATION'
+           env:
+           - name: UPLOAD_LOCATION
+             value: .well-known/acme-challenge
+           volumeMounts:
+           - name: rclone-conf-dir
+             mountPath: /.config/rclone
+         volumes:
+         - name: rclone-conf-dir
+           secret:
+             secretName: public-upload-rclone-config
