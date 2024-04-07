@@ -67,15 +67,14 @@ spec:
             image: rclone/rclone
             args:
             - '--config=/.config/rclone/rclone.conf'
-            - 'lsd $(STAGING_LOCATION)'
-            # - 'copy'
-            # - '$(STAGING_LOCATION)'
-            # - 'cc-public:$(UPLOAD_LOCATION)'
+            - 'copy'
+            - '$(STAGING_LOCATION)'
+            - 'cc-public:$(UPLOAD_LOCATION)'
             env:
             - name: STAGING_LOCATION
               value: /data
             - name: UPLOAD_LOCATION
-              value: .well-known/acme-challenge
+              value: public/.well-known/acme-challenge
             volumeMounts:
             - name: data-dir
               mountPath: /data
