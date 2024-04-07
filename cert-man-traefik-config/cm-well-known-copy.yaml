@@ -67,9 +67,10 @@ spec:
             image: rclone/rclone
             args:
             - '--config=/.config/rclone/rclone.conf'
-            - 'copy'
-            - '$(STAGING_LOCATION)'
-            - 'cc-public:$(UPLOAD_LOCATION)'
+            - 'lsd $(STAGING_LOCATION)'
+            # - 'copy'
+            # - '$(STAGING_LOCATION)'
+            # - 'cc-public:$(UPLOAD_LOCATION)'
             env:
             - name: STAGING_LOCATION
               value: /data
