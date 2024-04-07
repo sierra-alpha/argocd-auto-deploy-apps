@@ -68,8 +68,8 @@ spec:
             args:
             - '--config=/.config/rclone/rclone.conf'
             - 'copy'
-            - '$STAGING_LOCATION'
-            - 'cc-public:$UPLOAD_LOCATION'
+            - '$(STAGING_LOCATION)'
+            - 'cc-public:$(UPLOAD_LOCATION)'
             env:
             - name: STAGING_LOCATION
               value: /data
