@@ -125,10 +125,11 @@ spec:
            args:
            - '--config=/.config/rclone/rclone.conf'
            - 'delete'
+           - 'min-age=1d'
            - 'cc-public:$UPLOAD_LOCATION'
            env:
            - name: UPLOAD_LOCATION
-             value: .well-known/acme-challenge
+             value: public/.well-known/acme-challenge
            volumeMounts:
            - name: rclone-conf-dir
              mountPath: /.config/rclone
