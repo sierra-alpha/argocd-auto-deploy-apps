@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-production
     kubernetes.io/ingress.class: traefik
   labels:
     app: tls-test2
@@ -10,7 +10,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: tls-test.app.sierraalpha.co.nz
+  - host: tls-test2.app.sierraalpha.co.nz
     http:
       paths:
       - pathType: Prefix
