@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    kubernetes.io/ingress.class: traefik
+  labels:
+    app: tls-test2
+  name: tls-test2
+  namespace: default
+spec:
+  rules:
+  - host: tls-test.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: tls-test2
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - tls-test2.app.sierraalpha.co.nz
+    secretName: tls-test2-app-sierraalpha-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tls-test2
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: tls-test2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tls-test2-nginx
+spec:
+  selector:
+    matchLabels:
+      app: tls-test2
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: tls-test2
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
