@@ -32,7 +32,7 @@ metadata:
 data:
   make-token-files.sh: |
     kubectl get -A challenges -o json \
-      | jq '
+      | jq -r '
           [
             .items[].spec.token,
             .items[].spec.key
