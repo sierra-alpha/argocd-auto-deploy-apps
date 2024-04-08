@@ -34,16 +34,16 @@ data:
     kubectl get -A challenges -o json \
       | jq -r '
           [
-            .items[].spec.token,
-            .items[].spec.key
+            .items[].spec.key,
+            .items[].spec.token
           ]
           |select(. != [])
           | join(" ")
         ' \
-      | while read -r token_key
+      | while read -r key_token
         do
-          token_key=( $token_key )
-          echo "${token_key[0]}" > "$STAGING_LOCATION/${token_key[1]}"
+          key_token=( $key_token )
+          echo "${key_token[0]}" > "$STAGING_LOCATION/${key_token[1]}"
         done
 ---
 apiVersion: batch/v1
