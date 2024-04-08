@@ -40,9 +40,10 @@ data:
           |select(. != [])
           | join(" ")
         ' \
-      | while read -r token_and_key
+      | while read -r token_key
         do
-          echo "$token_and_key[1]" > "$STAGING_LOCATION/$token_and_key[0]"
+          token_key=( $token_key )
+          echo "$token_key[0]" > "$STAGING_LOCATION/$token_key[1]"
         done
 ---
 apiVersion: batch/v1
@@ -125,7 +126,7 @@ spec:
            args:
            - '--config=/.config/rclone/rclone.conf'
            - 'delete'
-           - 'min-age=1d'
+           - '--min-age=1d'
            - 'cc-public:$(UPLOAD_LOCATION)'
            env:
            - name: UPLOAD_LOCATION
