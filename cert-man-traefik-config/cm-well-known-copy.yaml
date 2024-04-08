@@ -43,7 +43,7 @@ data:
       | while read -r key_token
         do
           key_token=( $key_token )
-          echo "${key_token[0]}" > "$STAGING_LOCATION/${key_token[1]}"
+          printf "${key_token[0]}" > "$STAGING_LOCATION/${key_token[1]}"
         done
 ---
 apiVersion: batch/v1
