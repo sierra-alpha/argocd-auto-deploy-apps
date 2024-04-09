@@ -20,6 +20,7 @@ spec:
           ingress:
             enabled: true
             ingressClassName: traefik
+            hosts: grafana.app.sierraalpha.co.nz
   syncPolicy:
     automated:
       prune: true
