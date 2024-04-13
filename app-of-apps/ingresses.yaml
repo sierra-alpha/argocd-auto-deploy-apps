@@ -11,7 +11,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: ingresses.yaml
+    path: ingresses
     repoURL: https://github.com/sierra-alpha/agrocd-auto-deploy-apps
     targetRevision: HEAD
   syncPolicy:
