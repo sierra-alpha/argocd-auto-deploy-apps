@@ -22,12 +22,12 @@ spec:
           enabled: true
           className: traefik
           annotations:
-             cert-manager.io/cluster-issuer: letsencrypt-production
-             kubernetes.io/ingress.class: traefik
-             tls:
-             - secretName: nextcloud-tls
-               hosts:
-               - nextcloud.app.sierraalpha.co.nz
+            cert-manager.io/cluster-issuer: letsencrypt-production
+            kubernetes.io/ingress.class: traefik
+          tls:
+          - secretName: nextcloud-tls
+            hosts:
+            - nextcloud.app.sierraalpha.co.nz
   syncPolicy:
     automated:
       prune: true
