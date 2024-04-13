@@ -30,6 +30,9 @@ spec:
           - secretName: nextcloud-tls
             hosts:
             - nextcloud.app.sierraalpha.co.nz
+          phpClientHttpsFix:
+            enabled:
+              true
   syncPolicy:
     automated:
       prune: true
