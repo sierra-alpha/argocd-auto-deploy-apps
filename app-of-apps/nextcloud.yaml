@@ -25,7 +25,7 @@ spec:
             cert-manager.io/cluster-issuer: letsencrypt-production
             kubernetes.io/ingress.class: traefik
             traefik.ingress.kubernetes.io/router.middlewares:
-              nextcloud-redirect-https@kubernetescrd
+              traefik-redirect-https@kubernetescrd
           tls:
           - secretName: nextcloud-tls
             hosts:
