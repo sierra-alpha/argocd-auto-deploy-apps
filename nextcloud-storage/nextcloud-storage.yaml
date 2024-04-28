@@ -5,20 +5,31 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: ""
+  storageClassName: local-storage
   capacity:
     storage: 10Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  hostPath:
-    path: "/mnt/nfs/ssc/storage/nextcloud"
+  local:
+    path: /mnt/nfs/ssc/storage/nextcloud
+  nodeAffinity:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+            - rasomniac
+            - rampid2
+            - airsomniac1
+            - airsomniac2
+            - prosomniac
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nextcloud-storage-pvc
 spec:
-  storageClassName: ""
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   resources:
