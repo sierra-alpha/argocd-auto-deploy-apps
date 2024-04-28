@@ -1,0 +1,51 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   finalizers:
+#   - resources-finalizer.argocd.argoproj.io
+#   name: gitea
+#   namespace: argocd
+# spec:
+#   destination:
+#     namespace: gitea
+#     server: https://kubernetes.default.svc
+#   project: default
+#   source:
+#     chart: gitea
+#     repoURL: https://dl.gitea.com/charts/
+#     targetRevision: 10.1.4
+#     helm:
+#       valuesObject:
+#         nextcloud:
+#           host: nextcloud.app.sierraalpha.co.nz
+#         ingress:
+#           enabled: true
+#           className: traefik
+#           annotations:
+#             cert-manager.io/cluster-issuer: letsencrypt-production
+#             kubernetes.io/ingress.class: traefik
+#             traefik.ingress.kubernetes.io/router.middlewares:
+#               traefik-redirecthttps@kubernetescrd
+#           tls:
+#           - secretName: nextcloud-tls
+#             hosts:
+#             - nextcloud.app.sierraalpha.co.nz
+#         phpClientHttpsFix:
+#           enabled:
+#             true
+#         persistence:
+#           enabled:
+#             true
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#     - ServerSideApply=true
+#     - CreateNamespace=true
+#     retry:
+#       limit: 5
+#       backoff:
+#         duration: 15s
+#         factor: 2
+#         maxDuration: 5m

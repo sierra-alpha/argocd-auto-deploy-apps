@@ -36,6 +36,11 @@ spec:
         persistence:
           enabled:
             true
+          nextcloudData:
+            enabled:
+              true
+            existingClaim:
+              nextcloud-storage-pvc
   syncPolicy:
     automated:
       prune: true
