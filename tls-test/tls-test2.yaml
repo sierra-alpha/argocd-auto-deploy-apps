@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.middlewares:
       traefik-redirecthttps@kubernetescrd
   labels:
@@ -11,6 +10,7 @@ metadata:
   name: tls-test2
   namespace: default
 spec:
+  ingressClassName: traefik
   rules:
   - host: tls-test2.app.sierraalpha.co.nz
     http:
