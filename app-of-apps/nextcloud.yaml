@@ -18,6 +18,8 @@ spec:
       valuesObject:
         nextcloud:
           host: nextcloud.app.sierraalpha.co.nz
+          persistence:
+            subPath: nextcloud
         ingress:
           enabled: true
           className: traefik
@@ -35,9 +37,13 @@ spec:
         cronjob:
           enabled: true
         persistence:
-          enabled: false
+          enabled: true
+          existingClaim: nextcloud-config-pvc
+          accessMode: ReadWriteMany
+          size: 8Gi
           nextcloudData:
             enabled: true
+            subPath: nextcloud/data
             existingClaim: nextcloud-storage-pvc
             accessMode: ReadWriteMany
             size: 2Ti
@@ -86,6 +92,10 @@ spec:
           primary:
             persistence:
               enabled: true
+              existingClaim: nextcloud-db-pvc
+              subPath: nextcloud-db/pimary
+              accessModes:
+                - ReadWriteMany
             affinity: &affinity
           readReplicas:
             affinity: &affinity
