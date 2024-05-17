@@ -58,7 +58,8 @@ spec:
                         operator: NotIn
                         values:
                         - rasomniac
-            replica: *affinity
+            replica:
+              affinity: *affinity
 
         internalDatabase:
           enabled: false
