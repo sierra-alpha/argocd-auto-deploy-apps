@@ -1,3 +1,5 @@
+# Data Volumes
+#
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -28,6 +30,9 @@ spec:
     requests:
       storage: 2Ti
   volumeName: nextcloud-storage-pv
+#
+# Passwords
+#
 ---
 apiVersion: onepassword.com/v1
 kind: OnePasswordItem
