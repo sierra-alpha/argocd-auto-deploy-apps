@@ -1,63 +1,63 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   finalizers:
-#   - resources-finalizer.argocd.argoproj.io
-#   name: nextcloud
-#   namespace: argocd
-# spec:
-#   destination:
-#     namespace: nextcloud
-#     server: https://kubernetes.default.svc
-#   project: default
-#   source:
-#     chart: nextcloud
-#     repoURL: https://nextcloud.github.io/helm
-#     targetRevision: 4.6.6
-#     helm:
-#       valuesObject:
-#         nextcloud:
-#           host: nextcloud.app.sierraalpha.co.nz
-#         ingress:
-#           enabled: true
-#           className: traefik
-#           annotations:
-#             - cert-manager.io/cluster-issuer: letsencrypt-production
-#             - kubernetes.io/ingress.class: traefik
-#             - traefik.ingress.kubernetes.io/router.middlewares:
-#                 traefik-redirecthttps@kubernetescrd
-#           tls:
-#           - secretName: nextcloud-tls
-#             hosts:
-#             - nextcloud.app.sierraalpha.co.nz
-#         phpClientHttpsFix:
-#           enabled:
-#             true
-#         cronjob:
-#           enabled:
-#             true
-#         persistence:
-#           enabled:
-#             true
-#           nextcloudData:
-#             enabled:
-#               true
-#             existingClaim:
-#               nextcloud-storage-pvc
-#             accessMode:
-#               ReadWriteMany
-#             size:
-#               10Gi
-#   syncPolicy:
-#     automated:
-#       prune: true
-#       selfHeal: true
-#     syncOptions:
-#     - ServerSideApply=true
-#     - CreateNamespace=true
-#     retry:
-#       limit: 5
-#       backoff:
-#         duration: 15s
-#         factor: 2
-#         maxDuration: 5m
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  name: nextcloud
+  namespace: argocd
+spec:
+  destination:
+    namespace: nextcloud
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: nextcloud
+    repoURL: https://nextcloud.github.io/helm
+    targetRevision: 4.6.6
+    helm:
+      valuesObject:
+        nextcloud:
+          host: nextcloud.app.sierraalpha.co.nz
+        ingress:
+          enabled: true
+          className: traefik
+          annotations:
+            - cert-manager.io/cluster-issuer: letsencrypt-production
+            - kubernetes.io/ingress.class: traefik
+            - traefik.ingress.kubernetes.io/router.middlewares:
+                traefik-redirecthttps@kubernetescrd
+          tls:
+          - secretName: nextcloud-tls
+            hosts:
+            - nextcloud.app.sierraalpha.co.nz
+        phpClientHttpsFix:
+          enabled:
+            true
+        cronjob:
+          enabled:
+            true
+        persistence:
+          enabled:
+            true
+          nextcloudData:
+            enabled:
+              true
+            existingClaim:
+              nextcloud-storage-pvc
+            accessMode:
+              ReadWriteMany
+            size:
+              10Gi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ServerSideApply=true
+    - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m
