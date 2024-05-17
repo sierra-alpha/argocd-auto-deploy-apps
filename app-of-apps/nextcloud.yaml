@@ -35,7 +35,7 @@ spec:
         cronjob:
           enabled: true
         persistence:
-          enabled: true
+          enabled: false
           nextcloudData:
             enabled: true
             existingClaim: nextcloud-storage-pvc
