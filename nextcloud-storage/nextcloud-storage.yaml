@@ -2,36 +2,27 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: nextcloud-storage-pv
-  labels:
-    type: local
 spec:
-  storageClassName: local-path
   capacity:
     storage: 10Gi
-  volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
-  local:
-    path: /mnt/nfs/ssc/storage/nextcloud
-  nodeAffinity:
-    - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-            - rasomniac
-            - rampid2
-            - airsomniac1
-            - airsomniac2
-            - prosomniac
+    - ReadWriteMany
+  nfs:
+    server: rasomniac.sierraalpha.co.nz
+    path: /srv/nfs/ssc/nextcloud
+  mountOptions:
+    - nfsvers=4.2
+    - rw
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nextcloud-storage-pvc
 spec:
-  storageClassName: local-path
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
+  storageClassName: ""
   resources:
     requests:
       storage: 8Gi
+  volumeName: nextcloud-nfs
