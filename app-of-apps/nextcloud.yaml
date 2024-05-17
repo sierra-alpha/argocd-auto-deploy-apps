@@ -70,7 +70,6 @@ spec:
           primary:
             persistence:
               enabled: true
-              existingClaim: nextcloud-storage-pvc
 
   syncPolicy:
     automated:
