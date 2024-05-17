@@ -43,7 +43,7 @@ spec:
           size: 8Gi
           nextcloudData:
             enabled: true
-            subPath: nextcloud/data
+            subPath: nextcloud-data
             existingClaim: nextcloud-storage-pvc
             accessMode: ReadWriteMany
             size: 2Ti
