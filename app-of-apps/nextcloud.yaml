@@ -73,6 +73,17 @@ spec:
             persistence:
               enabled: true
 
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: NotIn
+                  values:
+                  - arm64
+                  - aarch64
+
   syncPolicy:
     automated:
       prune: true
