@@ -31,23 +31,46 @@ spec:
             hosts:
             - nextcloud.app.sierraalpha.co.nz
         phpClientHttpsFix:
-          enabled:
-            true
+          enabled: true
         cronjob:
-          enabled:
-            true
+          enabled: true
         persistence:
-          enabled:
-            true
+          enabled: true
           nextcloudData:
-            enabled:
-              true
-            existingClaim:
-              nextcloud-storage-pvc-v2
-            accessMode:
-              ReadWriteMany
-            size:
-              10Gi
+            enabled: true
+            existingClaim: nextcloud-storage-pvc
+            accessMode: ReadWriteMany
+            size: 2Ti
+        redis:
+          enable: true
+          auth:
+            existingSecret: nextcloud-redis-password
+            existingSecretPasswordKey: password
+
+        internalDatabase:
+          enabled: false
+        externalDatabase:
+          enabled: true
+          type: postgresql
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-postgresql-password
+            usernameKey: username
+            passwordKey: password
+        postgresql:
+          enabled: true
+          global:
+            postgresql:
+              auth:
+                existingSecret: nextcloud-postgresql-password
+                adminPasswordKey: password
+                userPasswordKey: password
+                replicationPasswordKey: password
+          primary:
+            persistence:
+              enabled: true
+              existingClaim: nextcloud-storage-pvc
+
   syncPolicy:
     automated:
       prune: true
