@@ -19,7 +19,7 @@ spec:
         nextcloud:
           host: nextcloud.app.sierraalpha.co.nz
           persistence:
-            subPath: nextcloud
+            subPath: nextcloud-config
         ingress:
           enabled: true
           className: traefik
