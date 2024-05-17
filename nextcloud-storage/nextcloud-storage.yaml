@@ -1,5 +1,8 @@
+---
+#
 # Config Volumes
 #
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -30,9 +33,11 @@ spec:
     requests:
       storage: 8Gi
   volumeName: nextcloud-config-pv
-
+---
+#
 # Data Volumes
 #
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -63,11 +68,11 @@ spec:
     requests:
       storage: 2Ti
   volumeName: nextcloud-storage-pv
-
 ---
 #
 # Database Volumes
 #
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -98,7 +103,7 @@ spec:
     requests:
       storage: 8Gi
   volumeName: nextcloud-db-pv
-
+---
 #
 # Passwords
 #
