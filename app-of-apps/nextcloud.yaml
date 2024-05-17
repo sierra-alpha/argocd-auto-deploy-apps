@@ -63,9 +63,10 @@ spec:
             postgresql:
               auth:
                 existingSecret: nextcloud-postgresql-password
-                adminPasswordKey: password
-                userPasswordKey: password
-                replicationPasswordKey: password
+                secretKeys:
+                  adminPasswordKey: password
+                  userPasswordKey: password
+                  replicationPasswordKey: password
           primary:
             persistence:
               enabled: true
