@@ -9,7 +9,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: rasomniac.sierraalpha.co.nz
-    path: /srv/nfs/ssc/nextcloud
+    path: /srv/nfs/ssc
   mountOptions:
     - nfsvers=4.2
     - rw
