@@ -24,5 +24,5 @@ spec:
   storageClassName: ""
   resources:
     requests:
-      storage: 8Gi
+      storage: 10Gi
   volumeName: nextcloud-nfs
