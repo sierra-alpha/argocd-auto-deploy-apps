@@ -44,6 +44,8 @@ spec:
               true
             existingClaim:
               nextcloud-storage-pvc
+            storageClass:
+              ""
             accessMode:
               ReadWriteMany
             size:
