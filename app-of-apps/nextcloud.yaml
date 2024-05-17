@@ -93,7 +93,7 @@ spec:
             persistence:
               enabled: true
               existingClaim: nextcloud-db-pvc
-              subPath: nextcloud-db/pimary
+              subPath: nextcloud-db/primary
               accessModes:
                 - ReadWriteMany
             affinity: &affinity
