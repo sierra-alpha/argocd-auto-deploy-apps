@@ -43,7 +43,7 @@ spec:
             enabled:
               true
             existingClaim:
-              nextcloud-storage-pvc
+              nextcloud-storage-pvc-v2
             accessMode:
               ReadWriteMany
             size:
