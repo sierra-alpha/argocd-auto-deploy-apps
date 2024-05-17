@@ -48,18 +48,18 @@ spec:
             enabled: true
             existingSecret: nextcloud-redis-password
             existingSecretPasswordKey: password
-            master:
-              affinity: &affinity
-                nodeAffinity:
-                  requiredDuringSchedulingIgnoredDuringExecution:
-                    nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: NotIn
-                        values:
-                        - rasomniac
-            replica:
-              affinity: *affinity
+          master:
+            affinity: &affinity
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                  - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values:
+                      - rasomniac
+          replica:
+            affinity: *affinity
 
         internalDatabase:
           enabled: false
