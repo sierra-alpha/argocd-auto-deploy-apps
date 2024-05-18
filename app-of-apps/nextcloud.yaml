@@ -20,6 +20,11 @@ spec:
           host: nextcloud.app.sierraalpha.co.nz
           persistence:
             subPath: nextcloud-config
+          podSecurityContext:
+            runAsUser: 33
+            runAsGroup: 33
+            runAsNonRoot: true
+            readOnlyRootFilesystem: false
         ingress:
           enabled: true
           className: traefik
