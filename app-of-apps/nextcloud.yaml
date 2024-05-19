@@ -23,24 +23,24 @@ spec:
           securityContext:
             runAsUser: 33
             runAsGroup: 33
-            runAsNonRoot: true
-            readOnlyRootFilesystem: false
-          hooks:
-            post-installation:
-              configure-redis: |
-                echo '## Configuring Redis...'
-                occ config:system:set redis \
-                  host --value="${NC_REDIS_HOST:?"NC_REDIS_HOST is unset"}"
-                occ config:system:set redis \
-                  password --value="${NC_REDIS_PASS:?"NC_REDIS_PASS is unset"}"
-                occ config:system:set redis \
-                  port --value="${NC_REDIS_PORT:-6379}"
-                occ config:system:set memcache.local \
-                  --value="\\OC\\Memcache\\APCu"
-                occ config:system:set memcache.distributed \
-                  --value="\\OC\\Memcache\\Redis"
-                occ config:system:set memcache.locking \
-                  --value="\\OC\\Memcache\\Redis"
+            runAsNonRoot: false #true
+            readOnlyRootFilesystem: true #false
+          # hooks:
+          #   post-installation:
+          #     configure-redis: |
+          #       echo '## Configuring Redis...'
+          #       occ config:system:set redis \
+          #         host --value="${NC_REDIS_HOST:?"NC_REDIS_HOST is unset"}"
+          #       occ config:system:set redis \
+          #         password --value="${NC_REDIS_PASS:?"NC_REDIS_PASS is unset"}"
+          #       occ config:system:set redis \
+          #         port --value="${NC_REDIS_PORT:-6379}"
+          #       occ config:system:set memcache.local \
+          #         --value="\\OC\\Memcache\\APCu"
+          #       occ config:system:set memcache.distributed \
+          #         --value="\\OC\\Memcache\\Redis"
+          #       occ config:system:set memcache.locking \
+          #         --value="\\OC\\Memcache\\Redis"
 
         ingress:
           enabled: true
