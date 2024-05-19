@@ -23,8 +23,8 @@ spec:
           securityContext:
             runAsUser: 33
             runAsGroup: 33
-            runAsNonRoot: false #true
-            readOnlyRootFilesystem: true #false
+            runAsNonRoot: false
+            readOnlyRootFilesystem: false
           # hooks:
           #   post-installation:
           #     configure-redis: |
