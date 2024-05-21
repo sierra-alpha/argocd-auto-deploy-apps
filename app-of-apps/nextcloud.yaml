@@ -16,6 +16,18 @@ spec:
     targetRevision: 4.6.6
     helm:
       valuesObject:
+        # This seems to get hoisted by ArgoCD or k8s I guess it's alphabetical
+        # so setting this first means the reference is available below
+        #
+        affinity: &affinity
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                  - rasomniac
         nextcloud:
           host: nextcloud.app.sierraalpha.co.nz
           persistence:
@@ -77,15 +89,7 @@ spec:
             existingSecret: nextcloud-redis-password
             existingSecretPasswordKey: password
           master:
-            affinity: &affinity
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                  - matchExpressions:
-                    - key: kubernetes.io/hostname
-                      operator: NotIn
-                      values:
-                      - rasomniac
+            affinity: *affinity
           replica:
             affinity: *affinity
 
@@ -121,8 +125,6 @@ spec:
             affinity: &affinity
           readReplicas:
             affinity: &affinity
-
-        affinity: *affinity
 
   syncPolicy:
     automated:
