@@ -122,9 +122,25 @@ spec:
               subPath: nextcloud-db/primary
               accessModes:
                 - ReadWriteMany
-            affinity: &affinity
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                  - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values:
+                      - rasomniac
           readReplicas:
-            affinity: &affinity
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                  - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values:
+                      - rasomniac
 
   syncPolicy:
     automated:
