@@ -13,7 +13,7 @@ spec:
   source:
     chart: nextcloud
     repoURL: https://nextcloud.github.io/helm
-    targetRevision: 4.6.6
+    targetRevision: 4.6.8
     helm:
       valuesObject:
         # This seems to get hoisted by ArgoCD or k8s I guess it's alphabetical
@@ -33,10 +33,9 @@ spec:
           persistence:
             subPath: nextcloud-config
           securityContext:
-            runAsUser: 33
+            runAsUser: 82
             runAsGroup: 33
-            # fsGroup: 33
-            runAsNonRoot: false
+            runAsNonRoot: true
             readOnlyRootFilesystem: false
           # hooks:
           #   post-installation:
