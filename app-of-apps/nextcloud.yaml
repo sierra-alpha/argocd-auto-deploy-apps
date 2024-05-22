@@ -88,16 +88,16 @@ spec:
             accessMode: ReadWriteMany
             size: 2Ti
 
-        redis:
-          enabled: true
-          auth:
-            enabled: true
-            existingSecret: nextcloud-redis-password
-            existingSecretPasswordKey: password
-          master:
-            affinity: *affinity
-          replica:
-            affinity: *affinity
+        # redis:
+        #   enabled: true
+        #   auth:
+        #     enabled: true
+        #     existingSecret: nextcloud-redis-password
+        #     existingSecretPasswordKey: password
+        #   master:
+        #     affinity: *affinity
+        #   replica:
+        #     affinity: *affinity
 
         internalDatabase:
           enabled: false
