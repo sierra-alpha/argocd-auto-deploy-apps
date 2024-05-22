@@ -33,9 +33,10 @@ spec:
           persistence:
             subPath: nextcloud-config
           securityContext:
-            # runAsUser: 33
+            runAsUser: 33
             runAsGroup: 33
-            runAsNonRoot: false
+            fsGroup: 33
+            runAsNonRoot: true
             readOnlyRootFilesystem: false
           # hooks:
           #   post-installation:
