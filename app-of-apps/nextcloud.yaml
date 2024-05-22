@@ -33,17 +33,17 @@ spec:
           persistence:
             subPath: nextcloud-config
           securityContext:
-            # runAsUser: 82
+            # runAsUser: 33
             runAsGroup: 33
             runAsNonRoot: false
             readOnlyRootFilesystem: false
 
           podSecurityContext:
             fsGroup: 33
-            # runAsUser: 82
-            # runAsGroup: 33
-            # runAsNonRoot: false
-            # readOnlyRootFilesystem: false
+            # runAsUser: 33
+            runAsGroup: 33
+            runAsNonRoot: false
+            readOnlyRootFilesystem: false
           # hooks:
           #   post-installation:
           #     configure-redis: |
