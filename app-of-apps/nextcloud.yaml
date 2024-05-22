@@ -37,6 +37,13 @@ spec:
             runAsGroup: 33
             runAsNonRoot: false
             readOnlyRootFilesystem: false
+
+          podSecurityContext:
+            fsGroup: 33
+            # runAsUser: 82
+            # runAsGroup: 33
+            # runAsNonRoot: false
+            # readOnlyRootFilesystem: false
           # hooks:
           #   post-installation:
           #     configure-redis: |
