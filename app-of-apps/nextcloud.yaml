@@ -43,7 +43,6 @@ spec:
             runAsUser: 33
             runAsGroup: 33
             runAsNonRoot: true
-            readOnlyRootFilesystem: false
           # hooks:
           #   post-installation:
           #     configure-redis: |
