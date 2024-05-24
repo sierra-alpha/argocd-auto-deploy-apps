@@ -28,6 +28,12 @@ spec:
                   operator: NotIn
                   values:
                   - rasomniac
+
+        livenessProbe:
+          initialDelaySeconds: 1000
+        readinessProbe:
+          initialDelaySeconds: 1000
+
         nextcloud:
           host: nextcloud.app.sierraalpha.co.nz
           persistence:
