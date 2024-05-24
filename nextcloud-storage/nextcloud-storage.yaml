@@ -1,40 +1,40 @@
----
-#
-# Config Volumes
-#
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-config-pv
-  namespace: nextcloud
-spec:
-  capacity:
-    storage: 8Gi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: rasomniac.sierraalpha.co.nz
-    path: /srv/nfs/ssc
-  mountOptions:
-    - nfsvers=4.2
-    - rw
-    - async
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-config-pvc
-  namespace: nextcloud
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: ""
-  resources:
-    requests:
-      storage: 8Gi
-  volumeName: nextcloud-config-pv
----
+# ---
+# #
+# # Config Volumes
+# #
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: nextcloud-config-pv
+#   namespace: nextcloud
+# spec:
+#   capacity:
+#     storage: 8Gi
+#   accessModes:
+#     - ReadWriteMany
+#   nfs:
+#     server: rasomniac.sierraalpha.co.nz
+#     path: /srv/nfs/ssc
+#   mountOptions:
+#     - nfsvers=4.2
+#     - rw
+#     - async
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: nextcloud-config-pvc
+#   namespace: nextcloud
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: ""
+#   resources:
+#     requests:
+#       storage: 8Gi
+#   volumeName: nextcloud-config-pv
+# ---
 #
 # Data Volumes
 #
