@@ -30,9 +30,9 @@ spec:
                   - rasomniac
 
         livenessProbe:
-          initialDelaySeconds: 10000000
+          initialDelaySeconds: 100
         readinessProbe:
-          initialDelaySeconds: 10000000
+          initialDelaySeconds: 100
 
         nextcloud:
           host: nextcloud.app.sierraalpha.co.nz
