@@ -17,9 +17,8 @@ spec:
     server: rasomniac.sierraalpha.co.nz
     path: /srv/nfs/ssc
   mountOptions:
-    - nfsvers=4.2
+    - nfsvers=3
     - rw
-    - async
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -53,7 +52,7 @@ spec:
     server: rasomniac.sierraalpha.co.nz
     path: /srv/nfs/ssc
   mountOptions:
-    - nfsvers=4.2
+    - nfsvers=3
     - rw
 ---
 apiVersion: v1
@@ -88,7 +87,7 @@ spec:
     server: rasomniac.sierraalpha.co.nz
     path: /srv/nfs/ssc
   mountOptions:
-    - nfsvers=4.2
+    - nfsvers=3
     - rw
 ---
 apiVersion: v1
