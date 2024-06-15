@@ -19,6 +19,7 @@ spec:
   mountOptions:
     - nfsvers=3
     - rw
+    - async
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
