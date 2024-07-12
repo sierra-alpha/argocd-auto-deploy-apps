@@ -15,7 +15,10 @@ spec:
     repoURL: https://aquasecurity.github.io/helm-charts/
     targetRevision: 0.24.1
     helm:
-      values: |
+      valuesObject: 
+        serviceMonitor:
+          # enabled determines whether a serviceMonitor should be deployed
+          enabled: true
         trivy:
           ignoreUnfixed: true
   syncPolicy:
