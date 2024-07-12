@@ -24,6 +24,12 @@ spec:
             - grafana.app.sierraalpha.co.nz
             paths:
             - /
+        prometheus:
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+            serviceMonitorSelector: {}
+            serviceMonitorNamespaceSelector: {}
+
   syncPolicy:
     automated:
       prune: true
