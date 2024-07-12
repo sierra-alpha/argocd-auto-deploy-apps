@@ -53,6 +53,7 @@ spec:
       labels:
         app: xtts-streaming-server
     spec:
+      nodeName: prosomniac
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -66,7 +67,7 @@ spec:
       - name: xtts-streaming-server
         resources:
           requests:
-            memory: "3Gi"
+            memory: "5Gi"
         image: ghcr.io/coqui-ai/xtts-streaming-server:latest-cpu
         ports:
         - containerPort: 80
