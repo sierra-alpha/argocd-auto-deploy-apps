@@ -43,6 +43,7 @@ data:
       | while read -r key_token
         do
           key_token=( $key_token )
+          echo "Writing key token ${key_token[0]} to ${key_token[1]}"
           printf "${key_token[0]}" > "$STAGING_LOCATION/${key_token[1]}"
         done
 ---
@@ -85,7 +86,7 @@ spec:
               mountPath: /.config/rclone
           initContainers:
           - name: token-file-writer
-            image: bitnami/kubectl
+            image: bitnami/kubectl:1.29
             command: ["/usr/bin/bash"]
             args: ["--", "/scripts/make-token-files.sh"]
             env:
