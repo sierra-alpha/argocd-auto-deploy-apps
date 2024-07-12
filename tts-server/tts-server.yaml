@@ -65,9 +65,6 @@ spec:
                 - rasomniac
       containers:
       - name: tts-server
-        resources:
-          requests:
-            memory: "5Gi"
         image: ghcr.io/coqui-ai/tts-cpu
         command:
         - '/bin/bash'
