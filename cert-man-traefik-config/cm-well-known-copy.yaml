@@ -62,6 +62,7 @@ spec:
             image: rclone/rclone:1.65
             args:
             - '--config=/.config/rclone/rclone.conf'
+            - '--checksum'
             - 'copy'
             - '$(STAGING_LOCATION)'
             - 'cc-public:$(UPLOAD_LOCATION)'
