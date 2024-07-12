@@ -53,6 +53,15 @@ spec:
       labels:
         app: xtts-streaming-server
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - rasomniac
       containers:
       - name: xtts-streaming-server
         image: ghcr.io/coqui-ai/xtts-streaming-server:latest-cpu
