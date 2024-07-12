@@ -64,6 +64,9 @@ spec:
                 - rasomniac
       containers:
       - name: xtts-streaming-server
+        resources:
+          requests:
+            memory: "3Gi"
         image: ghcr.io/coqui-ai/xtts-streaming-server:latest-cpu
         ports:
         - containerPort: 80
