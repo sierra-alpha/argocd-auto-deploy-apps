@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: xtts-streaming-server
+  name: tts-server
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: xtts-streaming-server
+    namespace: tts-server
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: xtts-streaming-server
+    path: tts-server
     repoURL: https://github.com/sierra-alpha/agrocd-auto-deploy-apps
     targetRevision: HEAD
   syncPolicy:

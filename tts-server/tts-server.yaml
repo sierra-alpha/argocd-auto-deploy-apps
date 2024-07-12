@@ -6,9 +6,9 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares:
       traefik-redirecthttps@kubernetescrd
   labels:
-    app: xtts-streaming-server
-  name: xtts-streaming-server
-  namespace: xtts-streaming-server
+    app: tts-server
+  name: tts-server
+  namespace: tts-server
 spec:
   rules:
   - host: xttsss.app.sierraalpha.co.nz
@@ -18,7 +18,7 @@ spec:
         path: /
         backend:
           service:
-            name: xtts-streaming-server
+            name: tts-server
             port:
               number: 80
   tls:
@@ -29,29 +29,29 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: xtts-streaming-server
-  namespace: xtts-streaming-server
+  name: tts-server
+  namespace: tts-server
 spec:
   ports:
     - port: 80
       protocol: TCP
   selector:
-    app: xtts-streaming-server
+    app: tts-server
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: xtts-streaming-server
-  namespace: xtts-streaming-server
+  name: tts-server
+  namespace: tts-server
 spec:
   selector:
     matchLabels:
-      app: xtts-streaming-server
+      app: tts-server
   replicas: 1
   template:
     metadata:
       labels:
-        app: xtts-streaming-server
+        app: tts-server
     spec:
       nodeName: prosomniac
       affinity:
@@ -64,13 +64,13 @@ spec:
                 values:
                 - rasomniac
       containers:
-      - name: xtts-streaming-server
+      - name: tts-server
         resources:
           requests:
             memory: "5Gi"
-        image: ghcr.io/coqui-ai/xtts-streaming-server:latest-cpu
+        image: ghcr.io/coqui-ai/tts-cpu
+        entrypoint: /bin/bash
+        args:
+        - 'python3 TTS/server/server.py'
         ports:
-        - containerPort: 80
-        env:
-        - name: COQUI_TOS_AGREED
-          value: '1'
+        - containerPort: 5002
