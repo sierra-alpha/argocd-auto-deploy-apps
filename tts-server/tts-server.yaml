@@ -69,7 +69,8 @@ spec:
           requests:
             memory: "5Gi"
         image: ghcr.io/coqui-ai/tts-cpu
-        entrypoint: /bin/bash
+        command:
+        - '/bin/bash'
         args:
         - 'python3 TTS/server/server.py'
         ports:
