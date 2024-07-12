@@ -36,7 +36,7 @@ data:
       | while read -r key_token
         do
           key_token=( $key_token )
-          echo "Writing key token ${key_token[0]} to ${key_token[1]}"
+          echo "Writing key ${key_token[0]} to token file ${key_token[1]}"
           printf "${key_token[0]}" > "$STAGING_LOCATION/${key_token[1]}"
         done
 ---
