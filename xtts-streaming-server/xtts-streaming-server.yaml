@@ -55,7 +55,7 @@ spec:
     spec:
       containers:
       - name: xtts-streaming-server
-        image: ghcr.io/coqui-ai/xtts-streaming-server:latest
+        image: ghcr.io/coqui-ai/xtts-streaming-server:latest-cpu
         ports:
         - containerPort: 80
         env:
