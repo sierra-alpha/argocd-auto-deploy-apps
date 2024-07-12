@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    kubernetes.io/ingress.class: traefik
+  labels:
+    app: xtts-streaming-server
+  name: xtts-streaming-server
+  namespace: default
+spec:
+  rules:
+  - host: xttsss.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: xtts-streaming-server
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - xttsss.app.sierraalpha.co.nz
+    secretName: xttsss-app-sierraalpha-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xtts-streaming-server
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: xtts-streaming-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xtts-streaming-server
+spec:
+  selector:
+    matchLabels:
+      app: xtts-streaming-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: xtts-streaming-server
+    spec:
+      containers:
+      - name: xtts-streaming-server
+        image: ghcr.io/coqui-ai/xtts-streaming-server:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: COQUI_TOS_AGREED
+          value: '1'
