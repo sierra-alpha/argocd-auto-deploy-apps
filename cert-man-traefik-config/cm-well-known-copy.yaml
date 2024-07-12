@@ -66,7 +66,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: acme-token-cloud-copy-job
-            image: rclone/rclone:1.65
+            image: 'rclone/rclone:1.65'
             args:
             - '--config=/.config/rclone/rclone.conf'
             - 'copy'
@@ -86,7 +86,7 @@ spec:
               mountPath: /.config/rclone
           initContainers:
           - name: token-file-writer
-            image: bitnami/kubectl:1.29
+            image: 'bitnami/kubectl:1.29'
             command: ["/usr/bin/bash"]
             args: ["--", "/scripts/make-token-files.sh"]
             env:
@@ -125,7 +125,7 @@ spec:
          restartPolicy: Never
          containers:
          - name: acme-token-cloud-delete-job
-           image: rclone/rclone
+           image: 'rclone/rclone:1.65'
            args:
            - '--config=/.config/rclone/rclone.conf'
            - 'delete'
