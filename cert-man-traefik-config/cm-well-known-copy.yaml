@@ -132,6 +132,8 @@ spec:
            - '--min-age=1d'
            - 'cc-public:$(UPLOAD_LOCATION)'
            env:
+           - name: RCLONE_VERBOSE
+             value: 2
            - name: UPLOAD_LOCATION
              value: /public/.well-known/acme-challenge
            volumeMounts:
