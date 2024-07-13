@@ -11,7 +11,7 @@ metadata:
   namespace: tts-server
 spec:
   rules:
-  - host: xttsss.app.sierraalpha.co.nz
+  - host: tts-server.app.sierraalpha.co.nz
     http:
       paths:
       - pathType: Prefix
@@ -23,8 +23,8 @@ spec:
               number: 80
   tls:
   - hosts:
-    - xttsss.app.sierraalpha.co.nz
-    secretName: xttsss-app-sierraalpha-tls
+    - tts-server.app.sierraalpha.co.nz
+    secretName: tts-server-app-sierraalpha-tls
 ---
 apiVersion: v1
 kind: Service
@@ -35,6 +35,7 @@ spec:
   ports:
     - port: 80
       protocol: TCP
+      targetPort: 5002
   selector:
     app: tts-server
 ---
