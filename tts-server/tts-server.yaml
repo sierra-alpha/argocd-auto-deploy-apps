@@ -69,6 +69,7 @@ spec:
         command:
         - '/bin/bash'
         args:
-        - 'python3 TTS/server/server.py'
+        - 'python3'
+        - 'TTS/server/server.py'
         ports:
         - containerPort: 5002
