@@ -67,9 +67,8 @@ spec:
       - name: tts-server
         image: ghcr.io/coqui-ai/tts-cpu
         command:
-        - '/bin/bash'
+        - 'usr/local/bin/python3'
         args:
-        - 'python3'
         - 'TTS/server/server.py'
         ports:
         - containerPort: 5002
