@@ -74,8 +74,11 @@ spec:
         # - '--list_models'
         - '--model_name'
         - 'tts_models/multilingual/multi-dataset/xtts_v2'
-        - '--vocoder_name'
-        - 'vocoder_models/universal/libri-tts/wavegrad'
+        # - '--vocoder_name'
+        # - 'vocoder_models/universal/libri-tts/wavegrad'
+        - '--config_path'
+        # - '/root/.local/share/tts/tts_models/multilingual/multi-dataset/xtts_v2/config.json'
+        - '/root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json'
         - '--use_cuda'
         - 'false'
         ports:
