@@ -74,10 +74,8 @@ spec:
         # - '--list_models'
         - '--model_name'
         - 'tts_models/multilingual/multi-dataset/xtts_v2'
-        # - '--speaker_idx'
-        # - 'Ana Florence'
-        # - '--language_idx'
-        # - 'en'
+        - '--vocoder_name'
+        - 'vocoder_models/universal/libri-tts/wavegrad'
         - '--use_cuda'
         - 'false'
         ports:
