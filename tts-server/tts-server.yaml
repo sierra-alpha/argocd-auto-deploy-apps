@@ -71,9 +71,9 @@ spec:
         - '/bin/bash'
         args:
         - '-c'
-        - "echo hello"
-        # - 'python'
-        # - '--version'
+        # - "echo hello"
+        - >
+          "python --version"
         # - 'TTS/server/server.py'
         # - '--model_name'
         # - 'tts_models/multilingual/multi-dataset/xtts_v2'
