@@ -73,7 +73,7 @@ spec:
         - '-c'
         # - "echo hello"
         - >
-          "python --version"
+          python --version
         # - 'TTS/server/server.py'
         # - '--model_name'
         # - 'tts_models/multilingual/multi-dataset/xtts_v2'
