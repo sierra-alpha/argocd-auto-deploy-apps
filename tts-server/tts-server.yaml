@@ -71,8 +71,8 @@ spec:
         - '/usr/local/bin/python3'
         args:
         - 'TTS/server/server.py'
-        - '--list_models'
-        # - '--model_name'
-        # - 'tts_models/multilingual/multi-dataset/xtts_v2'
+        # - '--list_models'
+        - '--model_name'
+        - 'tts_models/multilingual/multi-dataset/xtts_v2'
         ports:
         - containerPort: 5002
