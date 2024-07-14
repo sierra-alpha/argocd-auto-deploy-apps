@@ -71,7 +71,7 @@ spec:
         - '/bin/bash'
         args:
         - '-c'
-        - '"echo hello"'
+        - "echo hello"
         # - 'python'
         # - '--version'
         # - 'TTS/server/server.py'
