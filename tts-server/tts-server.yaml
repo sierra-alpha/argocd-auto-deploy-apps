@@ -70,9 +70,9 @@ spec:
         command:
         - '/bin/bash'
         args:
-        - '--version'
-        # - 'echo'
-        # - 'hello'
+        - '-c'
+        - 'echo'
+        - 'hello'
         # - 'python'
         # - '--version'
         # - 'TTS/server/server.py'
