@@ -70,10 +70,10 @@ spec:
         command:
         - '/bin/bash'
         args:
-        - 'python3'
-        - '--TTS/server/server.py'
-        - '--model_name'
-        - 'tts_models/multilingual/multi-dataset/xtts_v2'
+        - '-c'
+        - >
+          'python3 --TTS/server/server.py'
+          '--model_name tts_models/multilingual/multi-dataset/xtts_v2'
         # - ';'
         # - 'python3 TTS/server/server.py --model_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2 --config_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json'
 
