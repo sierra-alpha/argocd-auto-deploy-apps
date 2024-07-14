@@ -71,7 +71,7 @@ spec:
         - '/bin/bash'
         args:
         - '-c'
-        - 'python3'
+        - 'python'
         - '--version'
         # - 'TTS/server/server.py'
         # - '--model_name'
