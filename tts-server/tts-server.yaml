@@ -76,3 +76,7 @@ spec:
         - 'tts_models/multilingual/multi-dataset/xtts_v2'
         ports:
         - containerPort: 5002
+        env:
+        - name: COQUI_TOS_AGREED
+          value: '1'
+
