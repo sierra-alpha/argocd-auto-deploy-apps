@@ -1,0 +1,70 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.middlewares:
+      traefik-redirecthttps@kubernetescrd
+  labels:
+    app: audiobookshelf
+  name: audiobookshelf
+  namespace: audiobookshelf
+spec:
+  rules:
+  - host: audiobookshelf.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: audiobookshelf
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - audiobookshelf.app.sierraalpha.co.nz
+    secretName: audiobookshelf-app-sierraalpha-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: audiobookshelf
+  namespace: audiobookshelf
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: audiobookshelf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiobookshelf
+  namespace: audiobookshelf
+spec:
+  selector:
+    matchLabels:
+      app: audiobookshelf
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: audiobookshelf
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - rasomniac
+      containers:
+      - name: audiobookshelf
+        image: ghcr.io/advplyr/audiobookshelf
+        ports:
+        - containerPort: 80
+
