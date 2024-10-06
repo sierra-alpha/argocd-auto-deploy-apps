@@ -86,13 +86,13 @@ spec:
           enabled: true
         persistence:
           enabled: true
-          existingClaim: nextcloud-config-pvc
+          existingClaim: nextcloud-config-pvc2
           accessMode: ReadWriteMany
           size: 8Gi
           nextcloudData:
             enabled: true
             subPath: nextcloud-data
-            existingClaim: nextcloud-storage-pvc
+            existingClaim: nextcloud-storage-pvc2
             accessMode: ReadWriteMany
             size: 2Ti
 
@@ -132,7 +132,7 @@ spec:
           primary:
             persistence:
               enabled: true
-              existingClaim: nextcloud-db-pvc
+              existingClaim: nextcloud-db-pvc2
               subPath: nextcloud-db/primary
               accessModes:
                 - ReadWriteMany

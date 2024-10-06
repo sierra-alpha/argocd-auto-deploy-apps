@@ -4,106 +4,51 @@
 #
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-config-pv
-  namespace: nextcloud
-spec:
-  capacity:
-    storage: 8Gi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: rasomniac.sierraalpha.co.nz
-    path: /srv/nfs/ssc
-  mountOptions:
-    - nfsvers=3
-    - rw
-    - async
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-config-pvc
+  name: nextcloud-config-pvc2
   namespace: nextcloud
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: ""
   resources:
     requests:
       storage: 8Gi
-  volumeName: nextcloud-config-pv
+  storageClassName: seaweedfs-storage
 ---
 #
 # Data Volumes
 #
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-storage-pv
-  namespace: nextcloud
-spec:
-  capacity:
-    storage: 2Ti
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: rasomniac.sierraalpha.co.nz
-    path: /srv/nfs/ssc
-  mountOptions:
-    - nfsvers=3
-    - rw
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-storage-pvc
+  name: nextcloud-storage-pvc2
   namespace: nextcloud
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: ""
   resources:
     requests:
       storage: 2Ti
-  volumeName: nextcloud-storage-pv
+  storageClassName: seaweedfs-storage
 ---
 #
 # Database Volumes
 #
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-db-pv
-  namespace: nextcloud
-spec:
-  capacity:
-    storage: 8Gi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    server: rasomniac.sierraalpha.co.nz
-    path: /srv/nfs/ssc
-  mountOptions:
-    - nfsvers=3
-    - rw
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-db-pvc
+  name: nextcloud-db-pvc2
   namespace: nextcloud
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: ""
   resources:
     requests:
       storage: 8Gi
-  volumeName: nextcloud-db-pv
+  storageClassName: seaweedfs-storage
 ---
 #
 # Passwords
