@@ -13,7 +13,7 @@ spec:
   source:
     chart: seaweedfs-csi-driver
     repoURL: https://seaweedfs.github.io/seaweedfs-csi-driver/helm
-    targetRevision: 1.2.5
+    targetRevision: 0.2.2
     helm:
       valuesObject:
         seaweedfsFiler: "rasomniac:8888"
