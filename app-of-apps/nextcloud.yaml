@@ -91,7 +91,6 @@ spec:
           size: 8Gi
           nextcloudData:
             enabled: true
-            subPath: nextcloud-data
             existingClaim: nextcloud-data-pvc
             accessMode: ReadWriteMany
             size: 2Ti
@@ -133,7 +132,6 @@ spec:
             persistence:
               enabled: true
               existingClaim: nextcloud-db-pvc
-              subPath: nextcloud-db/primary
               accessModes:
                 - ReadWriteMany
             affinity:
