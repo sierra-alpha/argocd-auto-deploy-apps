@@ -4,51 +4,114 @@
 #
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: nextcloud-config-pvc2
+  name: nextcloud-config-pv
   namespace: nextcloud
 spec:
   accessModes:
-    - ReadWriteMany
+  - ReadWriteMany
+  capacity:
+    storage: 8Gi
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: nextcloud-config
+    volumeAttributes:
+      collection: default
+      replication: "002"
+      path: /buckets/k8s-data/nextcloud-config
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config-pvc
+  namespace: nextcloud
+spec:
+  storageClassName: ""
+  volumeName: nextcloud-config-pv
+  accessModes:
+  - ReadWriteMany
   resources:
     requests:
       storage: 8Gi
-  storageClassName: seaweedfs-storage
 ---
 #
 # Data Volumes
 #
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: nextcloud-storage-pvc2
+  name: nextcloud-data-pv
   namespace: nextcloud
 spec:
   accessModes:
-    - ReadWriteMany
+  - ReadWriteMany
+  capacity:
+    storage: 2Ti
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: nextcloud-data
+    volumeAttributes:
+      collection: default
+      replication: "001"
+      path: /buckets/k8s-data/nextcloud-data
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-data-pvc
+  namespace: nextcloud
+spec:
+  storageClassName: ""
+  volumeName: nextcloud-data-pv
+  accessModes:
+  - ReadWriteMany
   resources:
     requests:
-      storage: 2Ti
-  storageClassName: seaweedfs-storage
+      storage: 2ti
 ---
 #
 # Database Volumes
 #
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: nextcloud-db-pvc2
+  name: nextcloud-db-pv
   namespace: nextcloud
 spec:
   accessModes:
-    - ReadWriteMany
+  - ReadWriteMany
+  capacity:
+    storage: 8Gi
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: nextcloud-db
+    volumeAttributes:
+      collection: default
+      replication: "002"
+      path: /buckets/k8s-data/nextcloud-db
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-db-pvc
+  namespace: nextcloud
+spec:
+  storageClassName: ""
+  volumeName: nextcloud-db-pv
+  accessModes:
+  - ReadWriteMany
   resources:
     requests:
       storage: 8Gi
-  storageClassName: seaweedfs-storage
 ---
 #
 # Passwords
