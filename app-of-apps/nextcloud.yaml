@@ -30,10 +30,10 @@ spec:
                   - rasomniac
 
         livenessProbe:
-          initialDelaySeconds: 120
+          initialDelaySeconds: 12000
           failureThreshold: 6
         readinessProbe:
-          initialDelaySeconds: 120
+          initialDelaySeconds: 12000
           failureThreshold: 6
 
         nextcloud:
