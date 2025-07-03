@@ -26,7 +26,7 @@ data:
     output_location: /podcasts
     podcast_title: Money Stuff Newsletter TTS
     processed_label: Processed
-    senders: Shaun Alexander
+    senders: Matt Levine
     speaker_id: Damien Black
     subject_terms:
       - "Money Stuff:"
@@ -309,7 +309,7 @@ metadata:
   name: money-stuff-ttser
   namespace: audiobookshelf
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "*/30 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
