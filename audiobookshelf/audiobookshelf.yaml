@@ -298,12 +298,6 @@ spec:
         - name: audiobookshelf-podcasts-volume
           persistentVolumeClaim:
             claimName: audiobookshelf-podcasts-pvc
-        - name: moneystuff-config
-          configMap:
-            name: money-stuff-newsletter-configmap
-        - name: points-of-return-config
-          configMap:
-            name: points-of-return-newsletter-configmap
 ---
 #
 # Money stuff ttser
