@@ -1,5 +1,57 @@
 ---
 #
+# Passwords
+#
+---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: machines-google-password
+spec:
+  itemPath:
+    "vaults/K8s Service Account/items/machines-google"
+---
+#
+# Config Map
+#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: money-stuff-newsletter-configmap
+data:
+  config.yaml: |
+    gmail_email: machines.shaun.t.alexander@gmail.com
+    language_id: en
+    output_location: /podcasts
+    podcast_title: Money Stuff Newsletter TTS
+    processed_label: Processed
+    senders: Matt Levine
+    speaker_id: Damien Black
+    subject_terms:
+      - "Money Stuff:"
+    tts_url: https://tts-server.app.sierraalpha.co.nz/api/tts
+---
+#
+# Config Map
+#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: points-of-return-newsletter-configmap
+data:
+  config.yaml: |
+    gmail_email: machines.shaun.t.alexander@gmail.com
+    language_id: en
+    output_location: /podcasts
+    podcast_title: Points of Return Newsletter TTS
+    processed_label: Processed
+    senders: John Authers
+    speaker_id: Damien Black
+    tts_url: https://tts-server.app.sierraalpha.co.nz/api/tts
+---
+#
 # Audiobook Volumes
 #
 ---
@@ -224,7 +276,7 @@ spec:
           image: ghcr.io/advplyr/audiobookshelf
           ports:
           - containerPort: 80
-          volumesMounts:
+          volumeMounts:
             - name: audiobookshelf-audiobooks-volume
               mountPath: /audiobooks
             - name: audiobookshelf-config-volume
@@ -246,65 +298,89 @@ spec:
         - name: audiobookshelf-podcasts-volume
           persistentVolumeClaim:
             claimName: audiobookshelf-podcasts-pvc
-
-
-
-
-# ---
-# #
-# # Config Volumes
-# #
-# ---
-# apiVersion: v1
-# kind: PersistentVolume
-# metadata:
-#   name: nextcloud-config-pv
-#   namespace: nextcloud
-# spec:
-#   accessModes:
-#   - ReadWriteMany
-#   capacity:
-#     storage: 8Gi
-#   csi:
-#     driver: seaweedfs-csi-driver
-#     volumeHandle: nextcloud-config
-#     volumeAttributes:
-#       collection: default
-#       replication: "002"
-#       path: /buckets/k8s-data/nextcloud-config
-#   persistentVolumeReclaimPolicy: Retain
-#   volumeMode: Filesystem
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: nextcloud-config-pvc
-#   namespace: nextcloud
-# spec:
-#   storageClassName: ""
-#   volumeName: nextcloud-config-pv
-#   accessModes:
-#   - ReadWriteMany
-#   resources:
-#     requests:
-#       storage: 8Gi
-# ---
-# #
-# # Passwords
-# #
-# ---
-# apiVersion: onepassword.com/v1
-# kind: OnePasswordItem
-# metadata:
-#   name: nextcloud-postgresql-password
-# spec:
-#   itemPath:
-#     "vaults/K8s Service Account/items/nextcloud-postgresql-password"
-# ---
-# apiVersion: onepassword.com/v1
-# kind: OnePasswordItem
-# metadata:
-#   name: nextcloud-redis-password
-# spec:
-#   itemPath:
-#     "vaults/K8s Service Account/items/nextcloud-redis-password"
+        - name: moneystuff-config
+          configMap:
+            name: money-stuff-newsletter-configmap
+        - name: points-of-return-config
+          configMap:
+            name: points-of-return-newsletter-configmap
+---
+#
+# Money stuff ttser
+#
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: money-stuff-ttser
+  namespace: audiobookshelf
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: money-stuff-ttser
+              image: ghcr.io/sierra-alpha/voicemail
+              env:
+                - name: GMAIL_APP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: machines-google-password
+                      key: password
+              volumeMounts:
+                - name: moneystuff-config
+                  mountPath: /config.yaml
+                  subPath: config.yaml
+                - name: audiobookshelf-podcasts-volume
+                  mountPath: /podcasts
+          restartPolicy: OnFailure
+          volumes:
+            - name: moneystuff-config
+              configMap:
+                name: money-stuff-newsletter-configmap
+            - name: audiobookshelf-podcasts-volume
+              persistentVolumeClaim:
+                claimName: audiobookshelf-podcasts-pvc
+---
+#
+# Points of Return ttser
+#
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: points-of-return-ttser
+  namespace: audiobookshelf
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: points-of-return-ttser
+              image: ghcr.io/sierra-alpha/voicemail
+              env:
+                - name: GMAIL_APP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: machines-google-password
+                      key: password
+              volumeMounts:
+                - name: points-of-return-config
+                  mountPath: /config.yaml
+                  subPath: config.yaml
+                - name: audiobookshelf-podcasts-volume
+                  mountPath: /podcasts
+          restartPolicy: OnFailure
+          volumes:
+            - name: points-of-return-config
+              configMap:
+                name: points-of-return-newsletter-configmap
+            - name: audiobookshelf-podcasts-volume
+              persistentVolumeClaim:
+                claimName: audiobookshelf-podcasts-pvc
