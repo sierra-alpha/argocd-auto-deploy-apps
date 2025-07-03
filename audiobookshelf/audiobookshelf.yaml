@@ -1,3 +1,160 @@
+---
+#
+# Audiobook Volumes
+#
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: audiobookshelf-audiobooks-pv
+  namespace: audiobookshelf
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 50Gi
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: audiobookshelf-audiobooks
+    volumeAttributes:
+      collection: default
+      replication: "001"
+      path: /buckets/k8s-data/audiobookshelf-audiobooks
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-audiobooks-pvc
+  namespace: audiobookshelf
+spec:
+  storageClassName: ""
+  volumeName: audiobookshelf-audiobooks-pv
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+---
+#
+# Podcast Volumes
+#
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: audiobookshelf-podcasts-pv
+  namespace: audiobookshelf
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 50Gi
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: audiobookshelf-podcasts
+    volumeAttributes:
+      collection: default
+      replication: "001"
+      path: /buckets/k8s-data/audiobookshelf-podcasts
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-podcasts-pvc
+  namespace: audiobookshelf
+spec:
+  storageClassName: ""
+  volumeName: audiobookshelf-podcasts-pv
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+---
+#
+# Config Volumes
+#
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: audiobookshelf-config-pv
+  namespace: audiobookshelf
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 5Gi
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: audiobookshelf-config
+    volumeAttributes:
+      collection: default
+      replication: "001"
+      path: /buckets/k8s-data/audiobookshelf-config
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-config-pvc
+  namespace: audiobookshelf
+spec:
+  storageClassName: ""
+  volumeName: audiobookshelf-config-pv
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+#
+# Metadata Volumes
+#
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: audiobookshelf-metadata-pv
+  namespace: audiobookshelf
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 15Gi
+  csi:
+    driver: seaweedfs-csi-driver
+    volumeHandle: audiobookshelf-metadata
+    volumeAttributes:
+      collection: default
+      replication: "001"
+      path: /buckets/k8s-data/audiobookshelf-metadata
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audiobookshelf-metadata-pvc
+  namespace: audiobookshelf
+spec:
+  storageClassName: ""
+  volumeName: audiobookshelf-metadata-pv
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 15Gi
+---
+#
+# Ingress
+#
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -63,8 +220,91 @@ spec:
                 values:
                 - rasomniac
       containers:
-      - name: audiobookshelf
-        image: ghcr.io/advplyr/audiobookshelf
-        ports:
-        - containerPort: 80
+        - name: audiobookshelf
+          image: ghcr.io/advplyr/audiobookshelf
+          ports:
+          - containerPort: 80
+          volumesMounts:
+            - name: audiobookshelf-audiobooks-volume
+              mountPath: /audiobooks
+            - name: audiobookshelf-config-volume
+              mountPath: /config
+            - name: audiobookshelf-metadata-volume
+              mountPath: /metadata
+            - name: audiobookshelf-podcasts-volume
+              mountPath: /podcasts
+      volumes:
+        - name: audiobookshelf-audiobooks-volume
+          persistentVolumeClaim:
+            claimName: audiobookshelf-audiobooks-pvc
+        - name: audiobookshelf-config-volume
+          persistentVolumeClaim:
+            claimName: audiobookshelf-config-pvc
+        - name: audiobookshelf-metadata-volume
+          persistentVolumeClaim:
+            claimName: audiobookshelf-metadata-pvc
+        - name: audiobookshelf-podcasts-volume
+          persistentVolumeClaim:
+            claimName: audiobookshelf-podcasts-pvc
 
+
+
+
+# ---
+# #
+# # Config Volumes
+# #
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: nextcloud-config-pv
+#   namespace: nextcloud
+# spec:
+#   accessModes:
+#   - ReadWriteMany
+#   capacity:
+#     storage: 8Gi
+#   csi:
+#     driver: seaweedfs-csi-driver
+#     volumeHandle: nextcloud-config
+#     volumeAttributes:
+#       collection: default
+#       replication: "002"
+#       path: /buckets/k8s-data/nextcloud-config
+#   persistentVolumeReclaimPolicy: Retain
+#   volumeMode: Filesystem
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: nextcloud-config-pvc
+#   namespace: nextcloud
+# spec:
+#   storageClassName: ""
+#   volumeName: nextcloud-config-pv
+#   accessModes:
+#   - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 8Gi
+# ---
+# #
+# # Passwords
+# #
+# ---
+# apiVersion: onepassword.com/v1
+# kind: OnePasswordItem
+# metadata:
+#   name: nextcloud-postgresql-password
+# spec:
+#   itemPath:
+#     "vaults/K8s Service Account/items/nextcloud-postgresql-password"
+# ---
+# apiVersion: onepassword.com/v1
+# kind: OnePasswordItem
+# metadata:
+#   name: nextcloud-redis-password
+# spec:
+#   itemPath:
+#     "vaults/K8s Service Account/items/nextcloud-redis-password"
