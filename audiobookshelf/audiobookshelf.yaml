@@ -332,7 +332,7 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: machines-google-password
-                      key: app password
+                      key: app-password
               volumeMounts:
                 - name: moneystuff-config
                   mountPath: /config.yaml
@@ -381,7 +381,7 @@ spec:
                   valueFrom:
                     secretKeyRef:
                       name: machines-google-password
-                      key: app password
+                      key: app-password
               volumeMounts:
                 - name: points-of-return-config
                   mountPath: /config.yaml
