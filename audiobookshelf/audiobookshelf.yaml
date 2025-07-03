@@ -313,6 +313,15 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - rasomniac
       template:
         spec:
           containers:
@@ -349,10 +358,19 @@ metadata:
   name: points-of-return-ttser
   namespace: audiobookshelf
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "*/30 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - rasomniac
       template:
         spec:
           containers:
