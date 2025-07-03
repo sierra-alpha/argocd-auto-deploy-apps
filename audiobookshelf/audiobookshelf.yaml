@@ -313,17 +313,17 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                - rasomniac
       template:
         spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: NotIn
+                        values:
+                          - rasomniac
           containers:
             - name: money-stuff-ttser
               image: ghcr.io/sierra-alpha/voicemail
@@ -362,17 +362,17 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                - rasomniac
       template:
         spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: NotIn
+                        values:
+                          - rasomniac
           containers:
             - name: points-of-return-ttser
               image: ghcr.io/sierra-alpha/voicemail
