@@ -25,24 +25,24 @@ data:
     output_location: /podcasts
     processed_label: Processed
     tts_url:
-      - https://awhina.app.sierraalpha.co.nz/api/tts
+      - http://taraiwa.sierraalpha.co.nz:5002/api/tts
       - https://tts-server.app.sierraalpha.co.nz/api/tts
 
-      newsletters:
-        - podcast_title: Money Stuff Newsletter TTS
-          language_id: en
-          senders:
-            - Matt Levine
-            - Shaun Alexander
-          speaker_id: Damien Black
-          subject_terms:
-            - "Money Stuff:"
+    newsletters:
+      - podcast_title: Money Stuff Newsletter TTS
+        language_id: en
+        senders:
+          - Matt Levine
+          - Shaun Alexander
+        speaker_id: Damien Black
+        subject_terms:
+          - "Money Stuff:"
 
-        - podcast_title: Points of Return Newsletter TTS
-          language_id: en
-          senders:
-            - John Authers
-          speaker_id: Damien Black
+      - podcast_title: Points of Return Newsletter TTS
+        language_id: en
+        senders:
+          - John Authers
+        speaker_id: Ludvig Mikivoj
 ---
 #
 # Config Map
