@@ -25,8 +25,7 @@ data:
     output_location: /podcasts
     processed_label: Processed
     tts_url:
-      - https://tts-server-gpu.app.sierraalpha.co.nz/api/tts
-      - https://tts-server-cpu.app.sierraalpha.co.nz/api/tts
+      - https://tts-server.app.sierraalpha.co.nz/api/tts
 
     newsletters:
       - podcast_title: Money Stuff Newsletter TTS
