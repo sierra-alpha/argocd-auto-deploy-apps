@@ -230,6 +230,7 @@ metadata:
   name: audiobookshelf
   namespace: audiobookshelf
 spec:
+  ingressClassName: traefik
   rules:
   - host: audiobookshelf.app.sierraalpha.co.nz
     http:
