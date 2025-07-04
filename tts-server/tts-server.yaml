@@ -1,71 +1,58 @@
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.middlewares:
+      traefik-redirecthttps@kubernetescrd
+  labels:
+    app: tts-server
+  name: tts-server
+  namespace: tts-server
+spec:
+  rules:
+  - host: tts-server.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: tts-server
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - tts-server.app.sierraalpha.co.nz
+    secretName: tts-server-app-sierraalpha-tls
+---
+apiVersion: v1
+kind: Service
 metadata:
   name: tts-server
   namespace: tts-server
 spec:
-  entryPoints:
-    - web
-    - websecure
-  routes:
-    - match: Host(`tts-server.app.sierraalpha.co.nz`)
-      kind: Rule
-      services:
-        - name: tts-server-gpu
-          port: 80
-          weight: 100
-        - name: tts-server-cpu
-          port: 80
-          weight: 1
-  tls:
-    secretName: tts-server-app-sierraalpha-tls
----
-# Service for GPU
-apiVersion: v1
-kind: Service
-metadata:
-  name: tts-server-gpu
-  namespace: tts-server
-spec:
-  selector:
-    app: tts-server
-    type: gpu
   ports:
     - port: 80
       protocol: TCP
       targetPort: 5002
----
-# Service for CPU
-apiVersion: v1
-kind: Service
-metadata:
-  name: tts-server-cpu
-  namespace: tts-server
-spec:
   selector:
     app: tts-server
-    type: cpu
-  ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 5002
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tts-server-cpu
+  name: tts-server
   namespace: tts-server
 spec:
   selector:
     matchLabels:
       app: tts-server
-      type: cpu
   replicas: 1
   template:
     metadata:
       labels:
         app: tts-server
-        type: cpu
     spec:
       nodeName: prosomniac
       affinity:
@@ -84,58 +71,31 @@ spec:
         - '/bin/bash'
         args:
         - '-c'
+        # - "echo hello"
         - |
           python TTS/server/server.py \
             --model_name tts_models/multilingual/multi-dataset/xtts_v2 \
           || \
             python3 TTS/server/server.py --model_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2 --config_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json
+
+        # - ';'
+        # - 'python3 TTS/server/server.py --model_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2 --config_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json'
+
+        # # For when trying to launch straight into python.
+        # - 'TTS/server/server.py'
+        # # - '--list_models'
+        # - '--model_name'
+        # - 'tts_models/multilingual/multi-dataset/xtts_v2'
+        # # - '--vocoder_name'
+        # # - 'vocoder_models/universal/libri-tts/wavegrad'
+        # - '--config_path'
+        # # - '/root/.local/share/tts/tts_models/multilingual/multi-dataset/xtts_v2/config.json'
+        # - '/root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json'
+        # - '--use_cuda'
+        # - 'false'
         ports:
         - containerPort: 5002
         env:
         - name: COQUI_TOS_AGREED
           value: '1'
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: tts-server-gpu
-  namespace: tts-server
-spec:
-  selector:
-    matchLabels:
-      app: tts-server
-      type: gpu
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: tts-server
-        type: gpu
-    spec:
-      nodeName: taraiwa
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                - rasomniac
-      containers:
-      - name: tts-server
-        image: ghcr.io/idiap/coqui-tts
-        command:
-        - '/bin/bash'
-        args:
-        - '-c'
-        - |
-          python TTS/server/server.py \
-            --model_name tts_models/multilingual/multi-dataset/xtts_v2 \
-          || \
-            python3 TTS/server/server.py --model_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2 --config_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json
-        ports:
-        - containerPort: 5002
-        env:
-        - name: COQUI_TOS_AGREED
-          value: '1'
+
