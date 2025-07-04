@@ -25,7 +25,6 @@ data:
     output_location: /podcasts
     processed_label: Processed
     tts_url:
-      - http://taraiwa.sierraalpha.co.nz:5002/api/tts
       - https://tts-server.app.sierraalpha.co.nz/api/tts
 
     newsletters:
