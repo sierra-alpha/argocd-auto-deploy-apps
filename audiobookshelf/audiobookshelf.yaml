@@ -286,6 +286,7 @@ spec:
                 operator: NotIn
                 values:
                 - rasomniac
+                - obsidian
       containers:
         - name: audiobookshelf
           image: ghcr.io/advplyr/audiobookshelf
@@ -339,6 +340,7 @@ spec:
                         operator: NotIn
                         values:
                           - rasomniac
+                          - obsidian
           containers:
             - name: ttser
               image: ghcr.io/sierra-alpha/voicemail
