@@ -42,6 +42,9 @@ data:
         senders:
           - John Authers
         speaker_id: Ludvig Mikivoj
+
+        # Anoter good US speaker:
+        # speaker_id: Torcull Diarmuid
 ---
 #
 # Config Map
