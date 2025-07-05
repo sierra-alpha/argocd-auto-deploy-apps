@@ -28,6 +28,7 @@ spec:
                   operator: NotIn
                   values:
                   - rasomniac
+                  - obsidian
 
         livenessProbe:
           initialDelaySeconds: 12000
@@ -145,6 +146,7 @@ spec:
                       operator: NotIn
                       values:
                       - rasomniac
+                      - obsidian
           readReplicas:
             affinity:
               nodeAffinity:
@@ -155,6 +157,7 @@ spec:
                       operator: NotIn
                       values:
                       - rasomniac
+                      - obsidian
 
   syncPolicy:
     automated:

@@ -27,6 +27,7 @@ spec:
                     operator: NotIn
                     values:
                     - rasomniac
+                    - obsidian
 
   syncPolicy:
     automated:
