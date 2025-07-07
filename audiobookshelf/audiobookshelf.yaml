@@ -36,6 +36,7 @@ data:
         speaker_id: Damien Black
         subject_terms:
           - "Money Stuff:"
+          - "Money_Stuff:"
 
       - podcast_title: Points of Return Newsletter TTS
         language_id: en
@@ -316,7 +317,7 @@ spec:
             claimName: audiobookshelf-podcasts-pvc
 ---
 #
-# Money stuff ttser
+# ttser
 #
 ---
 apiVersion: batch/v1
