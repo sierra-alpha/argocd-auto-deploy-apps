@@ -14,6 +14,8 @@ spec:
 #
 # Config Map
 #
+# Another good US speaker:
+# speaker_id: Torcull Diarmuid
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -42,10 +44,8 @@ data:
         language_id: en
         senders:
           - John Authers
-        speaker_id: Ludvig Mikivoj
+        speaker_id: Ludvig Milivoj
 
-        # Anoter good US speaker:
-        # speaker_id: Torcull Diarmuid
 ---
 #
 # Config Map
