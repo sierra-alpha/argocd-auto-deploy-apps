@@ -60,7 +60,7 @@ spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 50Gi
+    storage: 150Gi
   csi:
     driver: seaweedfs-csi-driver
     volumeHandle: audiobookshelf-audiobooks
@@ -83,7 +83,7 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: 50Gi
+      storage: 150Gi
 ---
 #
 # Podcast Volumes
@@ -98,7 +98,7 @@ spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 50Gi
+    storage: 150Gi
   csi:
     driver: seaweedfs-csi-driver
     volumeHandle: audiobookshelf-podcasts
@@ -121,7 +121,7 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: 50Gi
+      storage: 150Gi
 ---
 #
 # Config Volumes
@@ -136,7 +136,7 @@ spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 5Gi
+    storage: 15Gi
   csi:
     driver: seaweedfs-csi-driver
     volumeHandle: audiobookshelf-config
@@ -159,7 +159,7 @@ spec:
   - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 15Gi
 ---
 #
 # Metadata Volumes
