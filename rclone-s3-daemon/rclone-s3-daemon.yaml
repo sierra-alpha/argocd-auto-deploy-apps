@@ -15,6 +15,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: rclone-s3
+  namespace: rclone-s3-daemon
 spec:
   selector:
     matchLabels:
