@@ -29,15 +29,15 @@ spec:
       - name: rclone-s3
         image: rclone/rclone:1
         args:
-          - '--config=/.config/rclone/rclone.conf'
-          - 'mount'
-          - '--allow-non-empty'
-          - '--allow-other'
-          - 'k8s-data-encrypted:'
-          - '/mnt/disks/k8s-data-encrypted'
+        - '--config=/.config/rclone/rclone.conf'
+        - 'mount'
+        - '--allow-non-empty'
+        - '--allow-other'
+        - 'k8s-data-encrypted:'
+        - '/mnt/disks/k8s-data-encrypted'
         env:
-          - name: RCLONE_VERBOSE
-            value: '2'
+        - name: RCLONE_VERBOSE
+          value: '2'
         lifecycle:
           preStop:
             exec:
@@ -46,18 +46,17 @@ spec:
           privileged: true
           capabilities:
             add:
-              - SYS_ADMIN
-        resources:
-          volumeMounts:
-            - name: rclone-conf-dir
-              mountPath: /.config/rclone
-            - name: media
-              mountPath: /mnt/disks/k8s-data-encrypted
-              mountPropagation: Bidirectional
-      volumes:
+            - SYS_ADMIN
+        volumeMounts:
         - name: rclone-conf-dir
-          secret:
-            secretName: k8s-data-rclone-config
+          mountPath: /.config/rclone
         - name: media
-          hostPath:
-            path: /mnt/disks/k8s-data-encrypted
+          mountPath: /mnt/disks/k8s-data-encrypted
+          mountPropagation: Bidirectional
+      volumes:
+      - name: rclone-conf-dir
+        secret:
+          secretName: k8s-data-rclone-config
+      - name: media
+        hostPath:
+          path: /mnt/disks/k8s-data-encrypted
