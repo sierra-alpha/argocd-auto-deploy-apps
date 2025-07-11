@@ -28,12 +28,12 @@ spec:
       - name: rclone-s3
         image: rclone/rclone:1
         args:
-          - 'mount'
-          - 'k8s-data-encrypted:'
-          - '/mnt/disks/k8s-data'
           - '--config=/.config/rclone/rclone.conf'
+          - 'mount'
           - '--allow-non-empty'
           - '--allow-other'
+          - 'k8s-data-encrypted:'
+          - '/mnt/disks/k8s-data-encrypted'
         env:
           - name: RCLONE_VERBOSE
             value: '2'
