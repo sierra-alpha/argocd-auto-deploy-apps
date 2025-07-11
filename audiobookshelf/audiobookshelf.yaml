@@ -48,25 +48,6 @@ data:
 
 ---
 #
-# Config Map
-#
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: points-of-return-newsletter-configmap
-data:
-  config.yaml: |
-    gmail_email: machines.shaun.t.alexander@gmail.com
-    language_id: en
-    output_location: /podcasts
-    podcast_title: Points of Return Newsletter TTS
-    processed_label: Processed
-    senders: John Authers
-    speaker_id: Damien Black
-    tts_url: https://tts-server.app.sierraalpha.co.nz/api/tts
----
-#
 # Audiobook Volumes
 #
 ---
