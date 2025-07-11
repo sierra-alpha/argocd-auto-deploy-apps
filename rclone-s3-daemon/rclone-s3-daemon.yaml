@@ -1,0 +1,62 @@
+---
+#
+# Secrets for upload
+#
+---
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: k8s-data-rclone-config
+spec:
+  itemPath:
+    "vaults/K8s Service Account/items/rclone-config-upload-wasabi-k8s-data-encrypted"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: rclone-s3
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rclone-s3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rclone-s3
+    spec:
+      containers:
+      - name: rclone-s3
+        image: rclone/rclone:1
+        args:
+          - 'mount'
+          - 'k8s-data-encrypted:'
+          - '/mnt/disks/k8s-data'
+          - '--config=/.config/rclone/rclone.conf'
+          - '--allow-non-empty'
+          - '--allow-other'
+        env:
+          - name: RCLONE_VERBOSE
+            value: '2'
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","fusermount -uz /mnt/disks/k8s-data"]
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        resources:
+          volumeMounts:
+            - name: rclone-conf-dir
+              mountPath: /.config/rclone
+            - name: media
+              mountPath: /mnt/disks/k8s-data-encrypted
+              mountPropagation: Bidirectional
+      volumes:
+        - name: rclone-conf-dir
+          secret:
+            secretName: k8s-data-rclone-config
+        - name: media
+          hostPath:
+            path: /mnt/disks/k8s-data-encrypted

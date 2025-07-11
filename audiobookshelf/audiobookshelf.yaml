@@ -68,7 +68,7 @@ spec:
       collection: default
       replication: "001"
       path: /buckets/k8s-data/audiobookshelf-audiobooks
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -106,7 +106,7 @@ spec:
       collection: default
       replication: "001"
       path: /buckets/k8s-data/audiobookshelf-podcasts
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -144,7 +144,7 @@ spec:
       collection: default
       replication: "001"
       path: /buckets/k8s-data/audiobookshelf-config
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -182,7 +182,7 @@ spec:
       collection: default
       replication: "001"
       path: /buckets/k8s-data/audiobookshelf-metadata
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -277,25 +277,29 @@ spec:
           volumeMounts:
             - name: audiobookshelf-audiobooks-volume
               mountPath: /audiobooks
+              mountPropagation: Bidirectional
             - name: audiobookshelf-config-volume
               mountPath: /config
+              mountPropagation: Bidirectional
             - name: audiobookshelf-metadata-volume
               mountPath: /metadata
+              mountPropagation: Bidirectional
             - name: audiobookshelf-podcasts-volume
               mountPath: /podcasts
+              mountPropagation: Bidirectional
       volumes:
         - name: audiobookshelf-audiobooks-volume
-          persistentVolumeClaim:
-            claimName: audiobookshelf-audiobooks-pvc
+          hostPath:
+            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/audiobooks
         - name: audiobookshelf-config-volume
-          persistentVolumeClaim:
-            claimName: audiobookshelf-config-pvc
+          hostPath:
+            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/config
         - name: audiobookshelf-metadata-volume
-          persistentVolumeClaim:
-            claimName: audiobookshelf-metadata-pvc
+          hostPath:
+            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata
         - name: audiobookshelf-podcasts-volume
-          persistentVolumeClaim:
-            claimName: audiobookshelf-podcasts-pvc
+          hostPath:
+            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts
 ---
 #
 # ttser
@@ -338,11 +342,12 @@ spec:
                   subPath: config.yaml
                 - name: audiobookshelf-podcasts-volume
                   mountPath: /podcasts
+                  mountPropagation: Bidirectional
           restartPolicy: OnFailure
           volumes:
             - name: ttser-config
               configMap:
                 name: ttser-configmap
             - name: audiobookshelf-podcasts-volume
-              persistentVolumeClaim:
-                claimName: audiobookshelf-podcasts-pvc
+              hostPath:
+                path: /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts

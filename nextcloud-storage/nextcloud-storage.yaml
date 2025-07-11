@@ -20,7 +20,7 @@ spec:
       collection: default
       replication: "002"
       path: /buckets/k8s-data/nextcloud-config
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -58,7 +58,7 @@ spec:
       collection: default
       replication: "001"
       path: /buckets/k8s-data/nextcloud-data
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -96,7 +96,7 @@ spec:
       collection: default
       replication: "002"
       path: /buckets/k8s-data/nextcloud-db
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
 ---
 apiVersion: v1
