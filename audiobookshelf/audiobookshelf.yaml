@@ -137,7 +137,7 @@ spec:
             path: /mnt/disks/k8s-data-encrypted/audiobookshelf/audiobooks
         - name: audiobookshelf-config-volume
           hostPath:
-            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/config
+            path: /mnt/disks/k8s-local-data/audiobookshelf/config
         - name: audiobookshelf-metadata-volume
           hostPath:
             path: /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata
