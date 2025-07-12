@@ -125,16 +125,12 @@ spec:
           volumeMounts:
             - name: audiobookshelf-audiobooks-volume
               mountPath: /audiobooks
-              mountPropagation: Bidirectional
             - name: audiobookshelf-config-volume
               mountPath: /config
-              mountPropagation: Bidirectional
             - name: audiobookshelf-metadata-volume
               mountPath: /metadata
-              mountPropagation: Bidirectional
             - name: audiobookshelf-podcasts-volume
               mountPath: /podcasts
-              mountPropagation: Bidirectional
       volumes:
         - name: audiobookshelf-audiobooks-volume
           hostPath:
@@ -190,7 +186,6 @@ spec:
                   subPath: config.yaml
                 - name: audiobookshelf-podcasts-volume
                   mountPath: /podcasts
-                  mountPropagation: Bidirectional
           restartPolicy: OnFailure
           volumes:
             - name: ttser-config
