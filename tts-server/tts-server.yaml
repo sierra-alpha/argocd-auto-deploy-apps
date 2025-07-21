@@ -83,45 +83,45 @@ spec:
         env:
         - name: COQUI_TOS_AGREED
           value: '1'
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: tts-server-obs
-  namespace: tts-server
-spec:
-  selector:
-    matchLabels:
-      app: tts-server
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: tts-server
-    spec:
-      nodeName: obsidian
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                - rasomniac
-      containers:
-      - name: tts-server
-        image: ghcr.io/idiap/coqui-tts-cpu
-        command:
-        - '/bin/bash'
-        args:
-        - '-c'
-        # - "echo hello"
-        - |
-          python TTS/server/server.py \
-            --model_name tts_models/multilingual/multi-dataset/xtts_v2 \
-          || \
-            python3 TTS/server/server.py --model_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2 --config_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: tts-server-obs
+#   namespace: tts-server
+# spec:
+#   selector:
+#     matchLabels:
+#       app: tts-server
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: tts-server
+#     spec:
+#       nodeName: obsidian
+#       affinity:
+#         nodeAffinity:
+#           requiredDuringSchedulingIgnoredDuringExecution:
+#             nodeSelectorTerms:
+#             - matchExpressions:
+#               - key: kubernetes.io/hostname
+#                 operator: NotIn
+#                 values:
+#                 - rasomniac
+#       containers:
+#       - name: tts-server
+#         image: ghcr.io/idiap/coqui-tts-cpu
+#         command:
+#         - '/bin/bash'
+#         args:
+#         - '-c'
+#         # - "echo hello"
+#         - |
+#           python TTS/server/server.py \
+#             --model_name tts_models/multilingual/multi-dataset/xtts_v2 \
+#           || \
+#             python3 TTS/server/server.py --model_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2 --config_path /root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2/config.json
 
         ports:
         - containerPort: 5002
