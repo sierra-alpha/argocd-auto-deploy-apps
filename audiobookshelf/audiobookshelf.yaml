@@ -85,6 +85,8 @@ kind: Service
 metadata:
   name: audiobookshelf
   namespace: audiobookshelf
+  annotations:
+    tailscale.com/expose: "true"
 spec:
   ports:
     - port: 80

@@ -31,6 +31,8 @@ kind: Service
 metadata:
   name: tts-server
   namespace: tts-server
+  annotations:
+    tailscale.com/expose: "true"
 spec:
   ports:
     - port: 80
