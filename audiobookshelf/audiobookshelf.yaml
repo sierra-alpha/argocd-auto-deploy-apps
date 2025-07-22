@@ -80,14 +80,29 @@ spec:
     - audiobookshelf.app.sierraalpha.co.nz
     secretName: audiobookshelf-app-sierraalpha-tls
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: audiobookshelf
+  name: audiobookshelf-tailscale
+  namespace: audiobookshelf
+spec:
+  defaultBackend:
+    service:
+      name: audiobookshelf
+      port:
+        number: 80
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - audiobookshelf
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: audiobookshelf
   namespace: audiobookshelf
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: audiobookshelf.app.sierraalpha.co.nz
 spec:
   ports:
     - port: 80

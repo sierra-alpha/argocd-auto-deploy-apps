@@ -26,14 +26,29 @@ spec:
     - tts-server.app.sierraalpha.co.nz
     secretName: tts-server-app-sierraalpha-tls
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: tts-server
+  name: tts-server-tailscale
+  namespace: tts-server
+spec:
+  defaultBackend:
+    service:
+      name: tts-server
+      port:
+        number: 80
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - tts-server
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: tts-server
   namespace: tts-server
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: tts-server.app.sierraalpha.co.nz
 spec:
   ports:
     - port: 80
