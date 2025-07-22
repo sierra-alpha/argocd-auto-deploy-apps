@@ -33,6 +33,7 @@ metadata:
   namespace: tts-server
   annotations:
     tailscale.com/expose: "true"
+    tailscale.com/hostname: tts-server.app.sierraalpha.co.nz
 spec:
   ports:
     - port: 80

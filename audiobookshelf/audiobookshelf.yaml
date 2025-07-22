@@ -87,6 +87,7 @@ metadata:
   namespace: audiobookshelf
   annotations:
     tailscale.com/expose: "true"
+    tailscale.com/hostname: audiobookshelf.app.sierraalpha.co.nz
 spec:
   ports:
     - port: 80
