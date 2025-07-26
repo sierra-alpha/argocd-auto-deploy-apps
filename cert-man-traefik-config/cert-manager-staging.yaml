@@ -10,8 +10,10 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-staging
     solvers:
-    - selector: {}
-      http01:
+    - dns01:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-dns-token-sierraalpha.co.nz
+            key: api-token
         ingress:
           class: traefik
-
