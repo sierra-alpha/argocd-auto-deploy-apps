@@ -55,3 +55,61 @@ spec:
         image: nginx
         ports:
         - containerPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    kubernetes.io/ingress.class: traefik
+  labels:
+    app: tls-test-staging
+  name: tls-test-staging
+  namespace: default
+spec:
+  rules:
+  - host: tls-test-staging.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: tls-test-staging
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - tls-test-staging.app.sierraalpha.co.nz
+    secretName: tls-test-staging-app-sierraalpha-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tls-test-staging
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: tls-test-staging
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tls-test-staging-nginx
+spec:
+  selector:
+    matchLabels:
+      app: tls-test-staging
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: tls-test-staging
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
