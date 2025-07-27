@@ -20,7 +20,7 @@ spec:
         extraArgs:
         - --acme-http01-solver-nameservers=8.8.8.8:53,1.1.1.1:53
         - --dns01-recursive-nameservers-only
-        - --dns01-self-check-nameservers=8.8.8.8:53\,1.1.1.1:53
+        - --dns01-recursive-nameservers=1.1.1.1:53
   syncPolicy:
     automated:
       prune: true
