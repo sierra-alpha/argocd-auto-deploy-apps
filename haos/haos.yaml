@@ -32,8 +32,18 @@ metadata:
   name: haos
   namespace: haos
 spec:
-  type: ExternalName
-  externalName: homeassistant.sierraalpha.co.nz
   ports:
     - port: 8123
       targetPort: 8123
+  clusterIP: None
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: haos
+  namespace: haos
+subsets:
+  - addresses:
+      - hostname: homeassistant.sierraalpha.co.nz
+    ports:
+      - port: 8123
