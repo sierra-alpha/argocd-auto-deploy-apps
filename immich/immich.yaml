@@ -1,0 +1,214 @@
+# ---
+# #
+# # Passwords
+# #
+# ---
+# apiVersion: onepassword.com/v1
+# kind: OnePasswordItem
+# metadata:
+#   name: machines-google-password
+# spec:
+#   itemPath:
+#     "vaults/K8s Service Account/items/machines-google"
+# ---
+# #
+# # Config Map
+# #
+# # Another good US speaker:
+# # speaker_id: Torcull Diarmuid
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: ttser-configmap
+# data:
+#   config.yaml: |
+#     gmail_email: machines.shaun.t.alexander@gmail.com
+#     output_location: /podcasts
+#     processed_label: Processed
+#     tts_url:
+#       - https://tts-server.app.sierraalpha.co.nz/api/tts
+
+#     newsletters:
+#       - podcast_title: Money Stuff Newsletter TTS
+#         language_id: en
+#         senders:
+#           - Matt Levine
+#           - Shaun Alexander
+#         speaker_id: Damien Black
+#         subject_terms:
+#           - "Money Stuff:"
+#           - "Money_Stuff:"
+
+#       - podcast_title: Points of Return Newsletter TTS
+#         language_id: en
+#         senders:
+#           - John Authers
+#         speaker_id: Ludvig Milivoj
+
+# ---
+# #
+# # Ingress
+# #
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   annotations:
+#     cert-manager.io/cluster-issuer: letsencrypt-production
+#     traefik.ingress.kubernetes.io/router.middlewares:
+#       traefik-redirecthttps@kubernetescrd
+#   labels:
+#     app: audiobookshelf
+#   name: audiobookshelf
+#   namespace: audiobookshelf
+# spec:
+#   ingressClassName: traefik
+#   rules:
+#   - host: audiobookshelf.app.sierraalpha.co.nz
+#     http:
+#       paths:
+#       - pathType: Prefix
+#         path: /
+#         backend:
+#           service:
+#             name: audiobookshelf
+#             port:
+#               number: 80
+#   tls:
+#   - hosts:
+#     - audiobookshelf.app.sierraalpha.co.nz
+#     secretName: audiobookshelf-app-sierraalpha-tls
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   labels:
+#     app: audiobookshelf
+#   name: audiobookshelf-tailscale
+#   namespace: audiobookshelf
+# spec:
+#   defaultBackend:
+#     service:
+#       name: audiobookshelf
+#       port:
+#         number: 80
+#   ingressClassName: tailscale
+#   tls:
+#     - hosts:
+#         - audiobookshelf
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: audiobookshelf
+#   namespace: audiobookshelf
+# spec:
+#   ports:
+#     - port: 80
+#       protocol: TCP
+#   selector:
+#     app: audiobookshelf
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: audiobookshelf
+#   namespace: audiobookshelf
+# spec:
+#   selector:
+#     matchLabels:
+#       app: audiobookshelf
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: audiobookshelf
+#     spec:
+#       affinity:
+#         nodeAffinity:
+#           requiredDuringSchedulingIgnoredDuringExecution:
+#             nodeSelectorTerms:
+#             - matchExpressions:
+#               - key: kubernetes.io/hostname
+#                 operator: NotIn
+#                 values:
+#                 - rasomniac
+#                 - obsidian
+#       containers:
+#         - name: audiobookshelf
+#           image: ghcr.io/advplyr/audiobookshelf
+#           ports:
+#           - containerPort: 80
+#           volumeMounts:
+#             - name: audiobookshelf-audiobooks-volume
+#               mountPath: /audiobooks
+#             - name: audiobookshelf-config-volume
+#               mountPath: /config
+#             - name: audiobookshelf-metadata-volume
+#               mountPath: /metadata
+#             - name: audiobookshelf-podcasts-volume
+#               mountPath: /podcasts
+#       volumes:
+#         - name: audiobookshelf-audiobooks-volume
+#           hostPath:
+#             path: /mnt/disks/k8s-data-encrypted/audiobookshelf/audiobooks
+#         - name: audiobookshelf-config-volume
+#           hostPath:
+#             path: /mnt/disks/k8s-local-data/audiobookshelf/config
+#         - name: audiobookshelf-metadata-volume
+#           hostPath:
+#             path: /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata
+#         - name: audiobookshelf-podcasts-volume
+#           hostPath:
+#             path: /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts
+# ---
+# #
+# # ttser
+# #
+# ---
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: ttser
+#   namespace: audiobookshelf
+# spec:
+#   schedule: "*/30 * * * *"
+#   concurrencyPolicy: Forbid
+#   jobTemplate:
+#     spec:
+#       template:
+#         spec:
+#           affinity:
+#             nodeAffinity:
+#               requiredDuringSchedulingIgnoredDuringExecution:
+#                 nodeSelectorTerms:
+#                   - matchExpressions:
+#                       - key: kubernetes.io/hostname
+#                         operator: NotIn
+#                         values:
+#                           - rasomniac
+#                           - obsidian
+#           containers:
+#             - name: ttser
+#               image: ghcr.io/sierra-alpha/voicemail
+#               env:
+#                 - name: GMAIL_APP_PASSWORD
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: machines-google-password
+#                       key: app-password
+#               volumeMounts:
+#                 - name: ttser-config
+#                   mountPath: /config.yaml
+#                   subPath: config.yaml
+#                 - name: audiobookshelf-podcasts-volume
+#                   mountPath: /podcasts
+#           restartPolicy: OnFailure
+#           volumes:
+#             - name: ttser-config
+#               configMap:
+#                 name: ttser-configmap
+#             - name: audiobookshelf-podcasts-volume
+#               hostPath:
+#                 path: /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts
