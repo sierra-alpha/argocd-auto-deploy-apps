@@ -20,12 +20,22 @@ spec:
           service:
             name: haos
             port:
-              number: 8123
+              number: 80
   tls:
   - hosts:
     - haos.app.sierraalpha.co.nz
     secretName: haos-app-sierraalpha-tls
 ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: haos
+#   namespace: haos
+# spec:
+#   ports:
+#     - port: 8123
+#       targetPort: 8123
+#   clusterIP: None
 apiVersion: v1
 kind: Service
 metadata:
@@ -33,17 +43,34 @@ metadata:
   namespace: haos
 spec:
   ports:
-    - port: 8123
-      targetPort: 8123
-  clusterIP: None
+    - name: http
+      protocol: TCP
+      port: 80 # The port Traefik will use to access this Service
+      targetPort: 8123 # The targetPort matching the EndpointSlice port
 ---
-apiVersion: v1
-kind: Endpoints
+# apiVersion: v1
+# kind: Endpoints
+# metadata:
+#   name: haos
+#   namespace: haos
+# subsets:
+#   - addresses:
+#       - ip: 192.168.1.100
+#     ports:
+#       - port: 8123
+
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
 metadata:
-  name: haos
+  name: haos-endpoint
   namespace: haos
-subsets:
+  labels:
+    kubernetes.io/service-name: haos # This label links to the Service
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 8123 # The port of your external service
+endpoints:
   - addresses:
-      - ip: 192.168.1.100
-    ports:
-      - port: 8123
+      - "192.168.1.100" # The IP address of your external service
