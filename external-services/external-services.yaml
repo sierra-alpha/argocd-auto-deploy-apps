@@ -73,6 +73,8 @@ spec:
   ports:
     - port: 80
       protocol: TCP
+  selector:
+    app: haproxy
 ---
 apiVersion: apps/v1
 kind: Deployment
