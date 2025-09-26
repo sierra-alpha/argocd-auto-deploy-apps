@@ -56,7 +56,7 @@ data:
     frontend external_services
       bind :80
       # Add more backends here as needed, to match ingresses above
-      use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
+      # use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
       default_backend default_servers
 
     backend default_servers
