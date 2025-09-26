@@ -5,6 +5,38 @@
 #
 ---
 #
+# test ingress
+#
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.middlewares:
+      traefik-redirecthttps@kubernetescrd
+  labels:
+    app: haproxy
+  name: external-services-test
+  namespace: external-services
+spec:
+  rules:
+  - host: external-services-test.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: haproxy
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - external-services-test.app.sierraalpha.co.nz
+    secretName: external-services-test-app-sierraalpha-tls
+---
+#
 # homeassistant ingress
 #
 ---
@@ -28,7 +60,7 @@ spec:
         path: /
         backend:
           service:
-            name: haos
+            name: haproxy
             port:
               number: 80
   tls:
@@ -61,16 +93,14 @@ data:
     frontend external_services
       bind :80
       # Add more backends here as needed, to match ingresses above
-      # use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
+      use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
       default_backend default_servers
 
     backend default_servers
-      mode http
-      server d-s1 hello-world.app.sierraalpha.co.nz
+      server d-s1 hello-world.app.sierraalpha.co.nz:80
 
     # Add more backends here as needed, to match ingresses above
     backend haos_servers
-      mode http
       server haos-s1 homeassistant.sierraalpha.co.nz:8123
 ---
 #
