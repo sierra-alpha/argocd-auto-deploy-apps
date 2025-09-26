@@ -47,7 +47,7 @@ metadata:
 data:
   haproxy.cfg: |
     global
-      log stdout
+      log stdout  format raw  local0  info
 
     defaults
       log global
