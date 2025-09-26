@@ -1,0 +1,115 @@
+---
+#
+# To use this, just add a new ingress for how you want the service to be
+# accessed from the wild, then add a matching config in the haproxy config map
+#
+---
+#
+# homeassistant ingress
+#
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.middlewares:
+      traefik-redirecthttps@kubernetescrd
+  labels:
+    app: haproxy
+  name: haos
+  namespace: external-services
+spec:
+  rules:
+  - host: haos.app.sierraalpha.co.nz
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: haos
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - haos.app.sierraalpha.co.nz
+    secretName: haos-app-sierraalpha-tls
+---
+#
+# Config Map
+#
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-configmap
+data:
+  haproxy.cfg: |
+    frontend external_services
+      mode http
+      bind :80
+      use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
+      default_backend default_servers
+
+    backend default_servers
+      mode http
+      server d-s1 hello-world.app.sierraalpha.co.nz
+
+    backend haos_servers
+      mode http
+      server haos-s1 homeassistant.sierraalpha.co.nz:8123
+---
+#
+# You shouldn't need to modify anything below here
+#
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy
+  namespace: external-services
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy
+  namespace: external-services
+spec:
+  selector:
+    matchLabels:
+      app: haproxy
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: haproxy
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - rasomniac
+                - obsidian
+      containers:
+        - name: haproxy
+          image: haproxy
+          ports:
+          - containerPort: 80
+          volumeMounts:
+            - name: ttser-config
+              mountPath: /etc/haproxy/haproxy.cfg
+              subPath: haproxy.cfg
+      restartPolicy: OnFailure
+      volumes:
+        - name: haproxy-config
+          configMap:
+            name: haproxy-configmap
