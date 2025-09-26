@@ -110,7 +110,6 @@ spec:
             - name: haproxy-config
               mountPath: /etc/haproxy/haproxy.cfg
               subPath: haproxy.cfg
-      restartPolicy: OnFailure
       volumes:
         - name: haproxy-config
           configMap:
