@@ -46,9 +46,16 @@ metadata:
   name: haproxy-configmap
 data:
   haproxy.cfg: |
-    frontend external_services
+    defaults
       mode http
+      timeout client 10s
+      timeout connect 5s
+      timeout server 10s
+      timeout http-request 10s
+
+    frontend external_services
       bind :80
+      # Add more backends here as needed, to match ingresses above
       use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
       default_backend default_servers
 
@@ -56,6 +63,7 @@ data:
       mode http
       server d-s1 hello-world.app.sierraalpha.co.nz
 
+    # Add more backends here as needed, to match ingresses above
     backend haos_servers
       mode http
       server haos-s1 homeassistant.sierraalpha.co.nz:8123
