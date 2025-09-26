@@ -46,12 +46,17 @@ metadata:
   name: haproxy-configmap
 data:
   haproxy.cfg: |
+    global
+      log stdout
+
     defaults
+      log global
+      option httplog
       mode http
-      timeout client 10s
-      timeout connect 5s
-      timeout server 10s
-      timeout http-request 10s
+      timeout client 50s
+      timeout connect 50s
+      timeout server 50s
+      timeout http-request 50s
 
     frontend external_services
       bind :80
