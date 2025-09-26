@@ -107,7 +107,7 @@ spec:
           ports:
           - containerPort: 80
           volumeMounts:
-            - name: ttser-config
+            - name: haproxy-config
               mountPath: /etc/haproxy/haproxy.cfg
               subPath: haproxy.cfg
       restartPolicy: OnFailure
