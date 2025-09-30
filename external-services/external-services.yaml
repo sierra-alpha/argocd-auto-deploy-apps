@@ -13,8 +13,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    traefik.ingress.kubernetes.io/router.middlewares:
-      traefik-redirecthttps@kubernetescrd
+    # traefik.ingress.kubernetes.io/router.middlewares:
+    #   traefik-redirecthttps@kubernetescrd
   labels:
     app: haproxy
   name: external-services-test
