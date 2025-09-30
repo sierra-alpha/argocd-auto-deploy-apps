@@ -13,8 +13,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    # traefik.ingress.kubernetes.io/router.middlewares:
-    #   traefik-redirecthttps@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares:
+      traefik-redirecthttps@kubernetescrd
   labels:
     app: haproxy
   name: external-services-test
@@ -76,7 +76,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   # Change the name here and in the deployment on each update to force a reload
-  name: haproxy-configmap-3
+  name: haproxy-configmap-4
 data:
   haproxy.cfg: |
     global
@@ -93,7 +93,7 @@ data:
 
     frontend external_services
       bind :80
-      bind :443
+      bind :443 ssl
       # Add more backends here as needed, to match ingresses above
       use_backend haos_servers if { req.hdr(host) -i haos.app.sierraalpha.co.nz }
       default_backend default_servers
@@ -159,4 +159,4 @@ spec:
         - name: haproxy-config
           configMap:
             # Change the name here and in the deployment on each update to force a reload
-            name: haproxy-configmap-3
+            name: haproxy-configmap-4
