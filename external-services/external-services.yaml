@@ -13,8 +13,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    # traefik.ingress.kubernetes.io/router.middlewares:
-    #   traefik-redirecthttps@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares:
+      traefik-redirecthttps@kubernetescrd
   labels:
     app: haproxy
   name: external-services-test
@@ -98,7 +98,7 @@ data:
       default_backend default_servers
 
     backend default_servers
-      server d-s1 hello-world.app.sierraalpha.co.nz:80 check
+      server d-s1 hello-world.app.sierraalpha.co.nz:443 check ssl
 
     # Add more backends here as needed, to match ingresses above
     backend haos_servers
