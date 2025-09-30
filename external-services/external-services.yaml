@@ -76,7 +76,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   # Change the name here and in the deployment on each update to force a reload
-  name: haproxy-configmap-2
+  name: haproxy-configmap-3
 data:
   haproxy.cfg: |
     global
@@ -99,7 +99,7 @@ data:
       default_backend default_servers
 
     backend default_servers
-      server d-s1 hello-world.app.sierraalpha.co.nz:443 check ssl
+      server d-s1 hello-world.app.sierraalpha.co.nz:443 check ssl verify none
 
     # Add more backends here as needed, to match ingresses above
     backend haos_servers
@@ -159,4 +159,4 @@ spec:
         - name: haproxy-config
           configMap:
             # Change the name here and in the deployment on each update to force a reload
-            name: haproxy-configmap-2
+            name: haproxy-configmap-3
