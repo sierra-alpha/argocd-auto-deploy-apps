@@ -69,39 +69,6 @@ spec:
     secretName: haos-app-sierraalpha-tls
 ---
 #
-# nextcloud ingress
-#
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-    traefik.ingress.kubernetes.io/router.middlewares:
-      traefik-redirecthttps@kubernetescrd
-    traefik.ingress.kubernetes.io/preserve-host: "false"
-  labels:
-    app: haproxy
-  name: haos
-  namespace: external-services
-spec:
-  rules:
-  - host: haos.app.sierraalpha.co.nz
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: haproxy
-            port:
-              number: 80
-  tls:
-  - hosts:
-    - haos.app.sierraalpha.co.nz
-    secretName: haos-app-sierraalpha-tls
----
-#
 # Config Map
 #
 ---
