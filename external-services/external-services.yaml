@@ -77,7 +77,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   # Change the name here and in the deployment on each update to force a reload
-  name: haproxy-configmap-8
+  name: haproxy-configmap-9
 data:
   haproxy.cfg: |
     global
@@ -165,4 +165,4 @@ spec:
         - name: haproxy-config
           configMap:
             # Change the name here and in the deployment on each update to force a reload
-            name: haproxy-configmap-8
+            name: haproxy-configmap-9
