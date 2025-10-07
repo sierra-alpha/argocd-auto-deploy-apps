@@ -76,7 +76,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   # Change the name here and in the deployment on each update to force a reload
-  name: haproxy-configmap-h
+  name: haproxy-configmap-t
 data:
   haproxy.cfg: |
     global
@@ -106,7 +106,6 @@ data:
       option forwardfor
       http-request set-header Host homeassistant.sierraalpha.co.nz
       http-request set-header X-Forwarded-Proto https
-      http-request set-header X-Forwarded-For %[src]
       server haos-s1 homeassistant.sierraalpha.co.nz:8123 check no-ssl
       # server haos-s1 httpbin.org:80 check
 ---
@@ -164,4 +163,4 @@ spec:
         - name: haproxy-config
           configMap:
             # Change the name here and in the deployment on each update to force a reload
-            name: haproxy-configmap-h
+            name: haproxy-configmap-t
