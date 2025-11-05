@@ -101,13 +101,13 @@ data:
       http-request set-header Host hello-world.app.sierraalpha.co.nz
       server d-s1 hello-world.app.sierraalpha.co.nz:80 check no-ssl
 
-    # Add more backends here as needed, to match ingresses above
-    backend haos_servers
-      option forwardfor
-      http-request set-header Host homeassistant.sierraalpha.co.nz
-      http-request set-header X-Forwarded-Proto https
-      server haos-s1 homeassistant.sierraalpha.co.nz:8123 check no-ssl
-      # server haos-s1 httpbin.org:80 check
+    # # Add more backends here as needed, to match ingresses above
+    # backend haos_servers
+    #   option forwardfor
+    #   http-request set-header Host homeassistant.sierraalpha.co.nz
+    #   http-request set-header X-Forwarded-Proto https
+    #   server haos-s1 homeassistant.sierraalpha.co.nz:8123 check no-ssl
+    #   # server haos-s1 httpbin.org:80 check
 ---
 #
 # You shouldn't need to modify anything below here
