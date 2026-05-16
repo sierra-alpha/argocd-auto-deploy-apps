@@ -84,7 +84,7 @@ spec:
                 - rasomniac
       containers:
       - name: tts-server
-        image: ghcr.io/idiap/coqui-tts-cpu
+        image: ghcr.io/idiap/coqui-tts-cpu:dev
         command:
         - '/bin/bash'
         args:
