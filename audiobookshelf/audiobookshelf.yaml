@@ -46,6 +46,14 @@ data:
           - John Authers
         speaker_id: Ludvig Milivoj
 
+    rss_feeds:
+      - podcast_title: Solidarity Newsletter TTS
+        url: https://www.solidarity.co.nz/international-stories?format=rss
+        speaker_id: Craig Gutsy
+        language_id: en
+        content_stream: html
+        max_items: 40
+
 ---
 #
 # Ingress
