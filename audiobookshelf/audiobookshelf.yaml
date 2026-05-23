@@ -49,7 +49,7 @@ data:
     rss_feeds:
       - podcast_title: Solidarity Newsletter TTS
         url: https://www.solidarity.co.nz/international-stories?format=rss
-        speaker_id: Craig Gutsy
+        speaker_id: Adde Michal
         language_id: en
         content_stream: html
         max_items: 40
