@@ -181,10 +181,11 @@ metadata:
   name: ttser
   namespace: audiobookshelf
 spec:
-  schedule: "*/30 * * * *"
-  concurrencyPolicy: Forbid
+  schedule: "0 * * * *"
+  concurrencyPolicy: Replace
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         spec:
           affinity:
