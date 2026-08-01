@@ -72,7 +72,6 @@ spec:
       labels:
         app: tts-server
     spec:
-      nodeName: prosomniac
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -82,6 +81,14 @@ spec:
                 operator: NotIn
                 values:
                 - rasomniac
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - prosomniac
       containers:
       - name: tts-server
         image: ghcr.io/idiap/coqui-tts-cpu:v0.27.3
