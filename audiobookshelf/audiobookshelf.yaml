@@ -135,14 +135,19 @@ spec:
     spec:
       affinity:
         nodeAffinity:
+          # Hard-pinned to prosomniac: audiobookshelf's own database
+          # (/mnt/disks/k8s-local-data/audiobookshelf/config/absdatabase.sqlite — users,
+          # sign-in sessions, listening progress) is node-local, not on the shared S3 mount
+          # like the other volumes. Failing over to another node would present an empty
+          # config dir and look like a fresh install. No preferredDuringScheduling fallback
+          # here on purpose — see ttser CronJob below for the failover-capable pattern.
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
               - key: kubernetes.io/hostname
-                operator: NotIn
+                operator: In
                 values:
-                - rasomniac
-                - obsidian
+                - prosomniac
       containers:
         - name: audiobookshelf
           image: ghcr.io/advplyr/audiobookshelf
@@ -198,6 +203,14 @@ spec:
                         values:
                           - rasomniac
                           - obsidian
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  preference:
+                    matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                          - prosomniac
           containers:
             - name: ttser
               image: ghcr.io/sierra-alpha/voicemail

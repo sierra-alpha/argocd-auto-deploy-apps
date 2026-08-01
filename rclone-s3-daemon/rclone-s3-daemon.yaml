@@ -41,7 +41,14 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/sh","-c","fusermount -uz /mnt/disks/k8s-data"]
+              command: ["/bin/sh","-c","fusermount -uz /mnt/disks/k8s-data-encrypted"]
+        livenessProbe:
+          exec:
+            command: ["/bin/sh","-c","timeout 15 ls /mnt/disks/k8s-data-encrypted >/dev/null"]
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 20
+          failureThreshold: 3
         securityContext:
           privileged: true
           capabilities:
