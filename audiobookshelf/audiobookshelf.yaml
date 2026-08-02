@@ -191,6 +191,9 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 0
+      # Kill a wedged run before the next hourly schedule fires, rather than
+      # relying solely on concurrencyPolicy: Replace to clean it up.
+      activeDeadlineSeconds: 3300
       template:
         spec:
           affinity:
