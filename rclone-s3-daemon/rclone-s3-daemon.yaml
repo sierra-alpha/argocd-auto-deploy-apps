@@ -7,6 +7,7 @@ apiVersion: onepassword.com/v1
 kind: OnePasswordItem
 metadata:
   name: k8s-data-rclone-config
+  namespace: rclone-s3-daemon
 spec:
   itemPath:
     "vaults/K8s Service Account/items/rclone-config-upload-wasabi-k8s-data-encrypted"
