@@ -28,13 +28,21 @@ spec:
       containers:
       - name: rclone-s3
         image: rclone/rclone:1
+        command:
+        - '/bin/sh'
         args:
-        - '--config=/.config/rclone/rclone.conf'
-        - 'mount'
-        - '--allow-non-empty'
-        - '--allow-other'
-        - 'k8s-data-encrypted:'
-        - '/mnt/disks/k8s-data-encrypted'
+        - '-c'
+        - |
+          set -eu
+          fusermount -uz /mnt/disks/k8s-data-encrypted 2>/dev/null || umount -l /mnt/disks/k8s-data-encrypted 2>/dev/null || true
+          mkdir -p /mnt/disks/k8s-data-encrypted
+          exec rclone \
+            --config=/.config/rclone/rclone.conf \
+            mount \
+            --allow-non-empty \
+            --allow-other \
+            k8s-data-encrypted: \
+            /mnt/disks/k8s-data-encrypted
         env:
         - name: RCLONE_VERBOSE
           value: '2'
@@ -58,7 +66,7 @@ spec:
         - name: rclone-conf-dir
           mountPath: /.config/rclone
         - name: media
-          mountPath: /mnt/disks/k8s-data-encrypted
+          mountPath: /mnt/disks
           mountPropagation: Bidirectional
       volumes:
       - name: rclone-conf-dir
@@ -66,4 +74,5 @@ spec:
           secretName: k8s-data-rclone-config
       - name: media
         hostPath:
-          path: /mnt/disks/k8s-data-encrypted
+          path: /mnt/disks
+          type: DirectoryOrCreate
