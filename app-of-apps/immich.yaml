@@ -12,7 +12,7 @@
 #   project: default
 #   source:
 #     path: immich
-#     repoURL: https://github.com/sierra-alpha/agrocd-auto-deploy-apps
+#     repoURL: https://github.com/sierra-alpha/argocd-auto-deploy-apps
 #     targetRevision: HEAD
 #   syncPolicy:
 #     automated:

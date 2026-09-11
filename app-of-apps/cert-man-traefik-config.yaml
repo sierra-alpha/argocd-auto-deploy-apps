@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: cert-man-traefik-config
-    repoURL: https://github.com/sierra-alpha/agrocd-auto-deploy-apps
+    repoURL: https://github.com/sierra-alpha/argocd-auto-deploy-apps
     targetRevision: HEAD
   syncPolicy:
     automated:
