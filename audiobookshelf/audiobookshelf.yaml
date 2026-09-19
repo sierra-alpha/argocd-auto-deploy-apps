@@ -156,12 +156,15 @@ spec:
           volumeMounts:
             - name: audiobookshelf-audiobooks-volume
               mountPath: /audiobooks
+              mountPropagation: HostToContainer
             - name: audiobookshelf-config-volume
               mountPath: /config
             - name: audiobookshelf-metadata-volume
               mountPath: /metadata
+              mountPropagation: HostToContainer
             - name: audiobookshelf-podcasts-volume
               mountPath: /podcasts
+              mountPropagation: HostToContainer
       volumes:
         - name: audiobookshelf-audiobooks-volume
           hostPath:
