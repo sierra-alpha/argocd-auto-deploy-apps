@@ -53,9 +53,9 @@ spec:
               command: ["/bin/sh","-c","fusermount -uz /mnt/disks/k8s-data-encrypted"]
         livenessProbe:
           exec:
-            # Reading the mount can be served from rclone's directory cache. Query the
-            # remote itself so an unreachable backend causes a clean FUSE remount.
-            command: ["/bin/sh","-c","timeout 15 rclone --config=/.config/rclone/rclone.conf lsf k8s-data-encrypted: --max-depth 1 >/dev/null"]
+            # Verify both the FUSE mount consumed by hostPath pods and its S3 backend.
+            # A failure of either requires a clean remount.
+            command: ["/bin/sh","-c","timeout 8 ls /mnt/disks/k8s-data-encrypted >/dev/null && timeout 8 rclone --config=/.config/rclone/rclone.conf lsf k8s-data-encrypted: --max-depth 1 >/dev/null"]
           initialDelaySeconds: 30
           periodSeconds: 60
           timeoutSeconds: 20
