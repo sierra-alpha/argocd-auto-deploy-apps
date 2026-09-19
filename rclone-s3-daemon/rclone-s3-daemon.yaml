@@ -50,7 +50,9 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/sh","-c","fusermount -uz /mnt/disks/k8s-data-encrypted"]
+              # rclone's image does not include fusermount; detach the host mount before
+              # a restart so the replacement daemon does not inherit stale FUSE state.
+              command: ["/bin/sh","-c","umount -l /mnt/disks/k8s-data-encrypted || true"]
         livenessProbe:
           exec:
             # Verify both the FUSE mount consumed by hostPath pods and its S3 backend.
