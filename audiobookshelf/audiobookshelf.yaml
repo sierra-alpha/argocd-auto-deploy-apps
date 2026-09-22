@@ -151,33 +151,30 @@ spec:
       containers:
         - name: audiobookshelf
           image: ghcr.io/advplyr/audiobookshelf
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              rm -rf /audiobooks /metadata /podcasts
+              ln -s /mnt/disks/k8s-data-encrypted/audiobookshelf/audiobooks /audiobooks
+              ln -s /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata /metadata
+              ln -s /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts /podcasts
+              exec tini -- node index.js
           ports:
           - containerPort: 80
           volumeMounts:
-            - name: audiobookshelf-audiobooks-volume
-              mountPath: /audiobooks
-              mountPropagation: HostToContainer
             - name: audiobookshelf-config-volume
               mountPath: /config
-            - name: audiobookshelf-metadata-volume
-              mountPath: /metadata
-              mountPropagation: HostToContainer
-            - name: audiobookshelf-podcasts-volume
-              mountPath: /podcasts
+            - name: audiobookshelf-disks-volume
+              mountPath: /mnt/disks
               mountPropagation: HostToContainer
       volumes:
-        - name: audiobookshelf-audiobooks-volume
-          hostPath:
-            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/audiobooks
         - name: audiobookshelf-config-volume
           hostPath:
             path: /mnt/disks/k8s-local-data/audiobookshelf/config
-        - name: audiobookshelf-metadata-volume
+        - name: audiobookshelf-disks-volume
           hostPath:
-            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata
-        - name: audiobookshelf-podcasts-volume
-          hostPath:
-            path: /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts
+            path: /mnt/disks
 ---
 #
 # ttser
