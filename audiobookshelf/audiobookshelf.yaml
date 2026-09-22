@@ -155,7 +155,7 @@ spec:
           args:
             - |
               set -eu
-              rm -rf /audiobooks /metadata /podcasts
+              rmdir /audiobooks /metadata /podcasts
               ln -s /mnt/disks/k8s-data-encrypted/audiobookshelf/audiobooks /audiobooks
               ln -s /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata /metadata
               ln -s /mnt/disks/k8s-data-encrypted/audiobookshelf/podcasts /podcasts
