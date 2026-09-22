@@ -12,6 +12,35 @@ spec:
   itemPath:
     "vaults/K8s Service Account/items/rclone-config-upload-wasabi-k8s-data-encrypted"
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rclone-fuse-watchdog
+  namespace: rclone-s3-daemon
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rclone-fuse-watchdog
+  namespace: rclone-s3-daemon
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rclone-fuse-watchdog
+  namespace: rclone-s3-daemon
+subjects:
+  - kind: ServiceAccount
+    name: rclone-fuse-watchdog
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rclone-fuse-watchdog
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -26,7 +55,53 @@ spec:
       labels:
         app.kubernetes.io/name: rclone-s3
     spec:
+      serviceAccountName: rclone-fuse-watchdog
       containers:
+      - name: rclone-fuse-watchdog
+        image: curlimages/curl:8.10.1
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          set -eu
+          api="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}"
+          token="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+          ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+          # Give rclone time to establish the initial FUSE mount.
+          sleep 45
+          while true; do
+            rm -f /tmp/probe-ok /tmp/probe-failed
+            (ls /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata >/dev/null \
+              && touch /tmp/probe-ok || touch /tmp/probe-failed) &
+
+            for _ in $(seq 1 8); do
+              [ -e /tmp/probe-ok ] && break
+              [ -e /tmp/probe-failed ] && break
+              sleep 1
+            done
+
+            if [ ! -e /tmp/probe-ok ]; then
+              echo "FUSE probe failed or hung; recreating this rclone pod"
+              curl --fail --silent --show-error --cacert "$ca" \
+                -H "Authorization: Bearer $token" \
+                -X DELETE "$api/api/v1/namespaces/$POD_NAMESPACE/pods/$POD_NAME"
+              sleep 300
+            fi
+            sleep 30
+          done
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: media
+          mountPath: /mnt/disks
+          mountPropagation: HostToContainer
       - name: rclone-s3
         image: rclone/rclone:1
         command:
@@ -55,9 +130,8 @@ spec:
               command: ["/bin/sh","-c","umount -l /mnt/disks/k8s-data-encrypted || true"]
         livenessProbe:
           exec:
-            # Verify both the FUSE mount consumed by hostPath pods and its S3 backend.
-            # A failure of either requires a clean remount.
-            command: ["/bin/sh","-c","timeout 8 ls /mnt/disks/k8s-data-encrypted >/dev/null && timeout 8 rclone --config=/.config/rclone/rclone.conf lsf k8s-data-encrypted: --max-depth 1 >/dev/null"]
+            # The watchdog container handles FUSE hangs; this probes Wasabi directly.
+            command: ["/bin/sh","-c","timeout 8 rclone --config=/.config/rclone/rclone.conf lsf k8s-data-encrypted: --max-depth 1 >/dev/null"]
           initialDelaySeconds: 30
           periodSeconds: 60
           timeoutSeconds: 20
