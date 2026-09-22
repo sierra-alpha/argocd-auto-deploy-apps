@@ -69,19 +69,28 @@ spec:
 
           # Give rclone time to establish the initial FUSE mount.
           sleep 45
+          failures=0
+          attempt=0
           while true; do
-            rm -f /tmp/probe-ok /tmp/probe-failed
+            attempt=$((attempt + 1))
+            result="/tmp/probe-result-$attempt"
             (stat /mnt/disks/k8s-data-encrypted >/dev/null \
-              && touch /tmp/probe-ok || touch /tmp/probe-failed) &
+              && printf ok >"$result" || printf failed >"$result") &
 
             for _ in $(seq 1 8); do
-              [ -e /tmp/probe-ok ] && break
-              [ -e /tmp/probe-failed ] && break
+              [ -e "$result" ] && break
               sleep 1
             done
 
-            if [ ! -e /tmp/probe-ok ]; then
-              echo "FUSE probe failed or hung; recreating this rclone pod"
+            if [ "$(cat "$result" 2>/dev/null || true)" = ok ]; then
+              failures=0
+            else
+              failures=$((failures + 1))
+              echo "FUSE probe failed or hung ($failures/3)"
+            fi
+
+            if [ "$failures" -ge 3 ]; then
+              echo "FUSE probe failed repeatedly; recreating this rclone pod"
               curl --fail --silent --show-error --cacert "$ca" \
                 -H "Authorization: Bearer $token" \
                 -X DELETE "$api/api/v1/namespaces/$POD_NAMESPACE/pods/$POD_NAME"
