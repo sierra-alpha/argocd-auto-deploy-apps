@@ -71,7 +71,7 @@ spec:
           sleep 45
           while true; do
             rm -f /tmp/probe-ok /tmp/probe-failed
-            (ls /mnt/disks/k8s-data-encrypted/audiobookshelf/metadata >/dev/null \
+            (stat /mnt/disks/k8s-data-encrypted >/dev/null \
               && touch /tmp/probe-ok || touch /tmp/probe-failed) &
 
             for _ in $(seq 1 8); do
