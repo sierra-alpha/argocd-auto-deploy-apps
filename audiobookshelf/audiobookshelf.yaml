@@ -159,9 +159,11 @@ spec:
                 - /bin/sh
                 - -ec
                 - |
-                  probe="$(find /podcasts -type f -size +0c -print -quit)"
-                  test -n "$probe"
-                  dd if="$probe" of=/dev/null bs=1 count=1 status=none
+                  probe=/podcasts/.livenessprobe
+                  if test ! -e "$probe"; then
+                    printf '%s\n' livenessprobe > "$probe"
+                  fi
+                  test "$(cat "$probe")" = livenessprobe
             initialDelaySeconds: 60
             periodSeconds: 60
             timeoutSeconds: 10
