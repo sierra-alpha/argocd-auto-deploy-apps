@@ -235,6 +235,8 @@ spec:
           containers:
             - name: ttser
               image: ghcr.io/sierra-alpha/voicemail
+              # Pull published ttser updates for every hourly/manual Job.
+              imagePullPolicy: Always
               env:
                 - name: GMAIL_APP_PASSWORD
                   valueFrom:
