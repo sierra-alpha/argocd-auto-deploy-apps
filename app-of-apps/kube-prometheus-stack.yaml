@@ -20,10 +20,17 @@ spec:
           ingress:
             enabled: true
             ingressClassName: traefik
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-production
+              traefik.ingress.kubernetes.io/router.middlewares: traefik-redirecthttps@kubernetescrd
             hosts:
             - grafana.app.sierraalpha.co.nz
             paths:
             - /
+            tls:
+            - secretName: grafana-app-sierraalpha-tls
+              hosts:
+              - grafana.app.sierraalpha.co.nz
         prometheus:
           prometheusSpec:
             serviceMonitorSelectorNilUsesHelmValues: false
