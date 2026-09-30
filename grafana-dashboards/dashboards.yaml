@@ -112,6 +112,11 @@ data:
           "id": 6, "type": "table", "title": "Vulnerabilities by namespace", "datasource": {"type": "prometheus", "uid": "prometheus"},
           "gridPos": {"h": 8, "w": 12, "x": 12, "y": 5}, "targets": [{"refId": "A", "expr": "sum(trivy_image_vulnerabilities) by (namespace, severity)", "format": "table", "instant": true}],
           "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 10}]}}, "overrides": []}, "options": {"showHeader": true, "cellHeight": "sm"}
+        },
+        {
+          "id": 7, "type": "table", "title": "Critical images to fix first", "description": "Select an image here, then inspect its matching VulnerabilityReport for the CVE and fixed package version.", "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 13}, "targets": [{"refId": "A", "expr": "topk(20, sum(trivy_image_vulnerabilities{severity=\"Critical\"}) by (namespace, image_repository, image_tag))", "format": "table", "instant": true}],
+          "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []}, "options": {"showHeader": true, "cellHeight": "sm"}
         }
       ]
     }
