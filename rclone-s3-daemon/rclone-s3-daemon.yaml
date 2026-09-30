@@ -58,7 +58,7 @@ spec:
       serviceAccountName: rclone-fuse-watchdog
       containers:
       - name: rclone-fuse-watchdog
-        image: curlimages/curl:8.10.1
+        image: curlimages/curl:8.21.0
         command: ["/bin/sh", "-c"]
         args:
         - |
