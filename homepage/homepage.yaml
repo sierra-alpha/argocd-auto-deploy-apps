@@ -102,7 +102,7 @@ spec:
             - containerPort: 3000
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: "*"
+              value: homepage.app.sierraalpha.co.nz
           volumeMounts:
             - name: config
               mountPath: /app/config
@@ -127,15 +127,25 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: homepage-tailscale
+  name: homepage
   namespace: homepage
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-redirecthttps@kubernetescrd
 spec:
-  ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: homepage
-      port:
-        number: 3000
+  ingressClassName: traefik
+  rules:
+    - host: homepage.app.sierraalpha.co.nz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homepage
+                port:
+                  number: 3000
   tls:
     - hosts:
-        - homepage
+        - homepage.app.sierraalpha.co.nz
+      secretName: homepage-app-sierraalpha-tls
