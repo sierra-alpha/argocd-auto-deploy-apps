@@ -1,0 +1,21 @@
+- Household:
+    - Audiobookshelf:
+        icon: audiobookshelf.png
+        href: https://audiobookshelf.app.sierraalpha.co.nz
+        description: Audiobooks and podcasts
+- Infrastructure:
+    - Argo CD:
+        icon: argo-cd.png
+        description: GitOps deployments
+    - Kubernetes:
+        icon: kubernetes.png
+        description: Cluster workloads
+- Observability:
+    - Grafana:
+        icon: grafana.png
+        description: Metrics and dashboards
+- Automation:
+    - AI Whisperer:
+        icon: github.png
+        href: https://github.com/sierra-alpha/ai-whisperer
+        description: Tasks and pull requests
