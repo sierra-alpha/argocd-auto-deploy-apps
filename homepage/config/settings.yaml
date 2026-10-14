@@ -1,0 +1,16 @@
+title: Home
+theme: dark
+color: slate
+layout:
+  Household:
+    style: row
+    columns: 3
+  Infrastructure:
+    style: row
+    columns: 3
+  Observability:
+    style: row
+    columns: 3
+  Automation:
+    style: row
+    columns: 3
