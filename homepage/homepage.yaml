@@ -1,72 +1,4 @@
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: homepage-config
-  namespace: homepage
-data:
-  settings.yaml: |
-    title: Home
-    theme: dark
-    color: slate
-    layout:
-      Household:
-        style: row
-        columns: 3
-      Infrastructure:
-        style: row
-        columns: 3
-      Observability:
-        style: row
-        columns: 3
-      Automation:
-        style: row
-        columns: 3
-  services.yaml: |
-    - Household:
-        - Audiobookshelf:
-            icon: audiobookshelf.png
-            href: https://audiobookshelf.app.sierraalpha.co.nz
-            description: Audiobooks and podcasts
-    - Infrastructure:
-        - Argo CD:
-            icon: argo-cd.png
-            description: GitOps deployments
-        - Kubernetes:
-            icon: kubernetes.png
-            description: Cluster workloads
-    - Observability:
-        - Grafana:
-            icon: grafana.png
-            description: Metrics and dashboards
-    - Automation:
-        - AI Whisperer:
-            icon: github.png
-            href: https://github.com/sierra-alpha/ai-whisperer
-            description: Tasks and pull requests
-  widgets.yaml: |
-    - resources:
-        cpu: true
-        memory: true
-        disk: /
-    - datetime:
-        text_size: md
-        format:
-          dateStyle: long
-          timeStyle: short
-          hour12: false
-  bookmarks.yaml: |
-    - Projects:
-        - AI Whisperer:
-            - href: https://github.com/sierra-alpha/ai-whisperer
-              description: Automation engine
-  docker.yaml: |
-    {}
-  kubernetes.yaml: |
-    mode: disabled
-  custom.css: ""
-  custom.js: ""
----
-apiVersion: v1
 kind: Service
 metadata:
   name: homepage
@@ -113,8 +45,37 @@ spec:
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: homepage.app.sierraalpha.co.nz
           volumeMounts:
-            - name: config
-              mountPath: /app/config
+            - name: config-source
+              mountPath: /app/config/settings.yaml
+              subPath: settings.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/services.yaml
+              subPath: services.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/widgets.yaml
+              subPath: widgets.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/bookmarks.yaml
+              subPath: bookmarks.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/docker.yaml
+              subPath: docker.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/kubernetes.yaml
+              subPath: kubernetes.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/custom.css
+              subPath: custom.css
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/custom.js
+              subPath: custom.js
               readOnly: true
           readinessProbe:
             httpGet:
@@ -132,7 +93,7 @@ spec:
             limits:
               memory: 512Mi
       volumes:
-        - name: config
+        - name: config-source
           configMap:
             name: homepage-config
 ---
