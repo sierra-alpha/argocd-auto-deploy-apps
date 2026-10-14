@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: homepage
 resources:
   - homepage.yaml
+  - rbac.yaml
 configMapGenerator:
   - name: homepage-config
     files:
