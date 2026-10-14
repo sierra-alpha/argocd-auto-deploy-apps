@@ -94,6 +94,15 @@ spec:
       labels:
         app: homepage
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - rasomniac
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:latest
