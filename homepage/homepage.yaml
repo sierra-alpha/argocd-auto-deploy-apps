@@ -102,7 +102,7 @@ spec:
             - containerPort: 3000
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: homepage
+              value: "*"
           volumeMounts:
             - name: config
               mountPath: /app/config
