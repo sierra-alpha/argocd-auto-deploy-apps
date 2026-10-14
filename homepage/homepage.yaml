@@ -103,6 +103,21 @@ spec:
                     operator: NotIn
                     values:
                       - rasomniac
+      initContainers:
+        - name: prepare-config
+          image: busybox:1.36
+          command:
+            - sh
+            - -ec
+            - |
+              cp -L /config-source/* /config/
+              mkdir -p /config/logs
+          volumeMounts:
+            - name: config-source
+              mountPath: /config-source
+              readOnly: true
+            - name: config
+              mountPath: /config
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:latest
@@ -115,7 +130,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /app/config
-              readOnly: true
           readinessProbe:
             httpGet:
               path: /
@@ -133,6 +147,8 @@ spec:
               memory: 512Mi
       volumes:
         - name: config
+          emptyDir: {}
+        - name: config-source
           configMap:
             name: homepage-config
 ---
