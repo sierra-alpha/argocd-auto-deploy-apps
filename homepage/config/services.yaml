@@ -6,9 +6,11 @@
 - Infrastructure:
     - Argo CD:
         icon: argo-cd.png
+        href: https://argocd.app.sierraalpha.co.nz
         description: GitOps deployments
     - Kubernetes:
         icon: kubernetes.png
+        href: https://argocd.app.sierraalpha.co.nz/applications
         description: Cluster workloads
 - Observability:
     - Grafana:
