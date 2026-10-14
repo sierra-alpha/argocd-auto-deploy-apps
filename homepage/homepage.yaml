@@ -120,6 +120,9 @@ spec:
             httpGet:
               path: /
               port: 3000
+              httpHeaders:
+                - name: Host
+                  value: homepage.app.sierraalpha.co.nz
             initialDelaySeconds: 10
             periodSeconds: 10
           resources:
