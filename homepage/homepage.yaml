@@ -26,6 +26,7 @@ spec:
       labels:
         app: homepage
     spec:
+      serviceAccountName: homepage
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
