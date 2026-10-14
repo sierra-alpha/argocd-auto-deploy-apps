@@ -103,21 +103,6 @@ spec:
                     operator: NotIn
                     values:
                       - rasomniac
-      initContainers:
-        - name: prepare-config
-          image: busybox:1.36
-          command:
-            - sh
-            - -ec
-            - |
-              cp -L /config-source/* /config/
-              mkdir -p /config/logs
-          volumeMounts:
-            - name: config-source
-              mountPath: /config-source
-              readOnly: true
-            - name: config
-              mountPath: /config
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:latest
@@ -128,8 +113,38 @@ spec:
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: homepage.app.sierraalpha.co.nz
           volumeMounts:
-            - name: config
-              mountPath: /app/config
+            - name: config-source
+              mountPath: /app/config/settings.yaml
+              subPath: settings.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/services.yaml
+              subPath: services.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/widgets.yaml
+              subPath: widgets.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/bookmarks.yaml
+              subPath: bookmarks.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/docker.yaml
+              subPath: docker.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/kubernetes.yaml
+              subPath: kubernetes.yaml
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/custom.css
+              subPath: custom.css
+              readOnly: true
+            - name: config-source
+              mountPath: /app/config/custom.js
+              subPath: custom.js
+              readOnly: true
           readinessProbe:
             httpGet:
               path: /
@@ -146,8 +161,6 @@ spec:
             limits:
               memory: 512Mi
       volumes:
-        - name: config
-          emptyDir: {}
         - name: config-source
           configMap:
             name: homepage-config
