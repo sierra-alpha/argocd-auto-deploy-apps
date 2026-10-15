@@ -11,10 +11,14 @@
         icon: snapcast.png
         href: http://mediasomniac.sierraalpha.co.nz:1780
         description: Snapcast audio groups and playback
-    - TTSer:
+    - Coqui TTS:
         icon: mdi-text-to-speech
-        href: https://github.com/sierra-alpha/argocd-auto-deploy-apps/blob/main/audiobookshelf/audiobookshelf.yaml
-        description: Podcast TTS pipeline configuration (no web UI)
+        href: https://tts-server.app.sierraalpha.co.nz
+        description: XTTS voice synthesis service
+    - Home Assistant:
+        icon: home-assistant.png
+        href: https://haos.app.sierraalpha.co.nz
+        description: Smart home control and automations
 - Monitoring & Health:
     - Beszel:
         icon: beszel.png
@@ -28,6 +32,10 @@
         icon: grafana.png
         href: https://grafana.app.sierraalpha.co.nz
         description: Dashboards and metrics
+    - tutei (NVR):
+        icon: frigate.png
+        href: http://rampidv1-2--1.sierraalpha.co.nz:8080
+        description: Frigate camera host — view health in Gatus
 - Infrastructure & Storage:
     - MikroTik:
         icon: mikrotik.png
