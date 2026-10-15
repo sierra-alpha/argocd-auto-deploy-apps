@@ -1,0 +1,31 @@
+/*
+ * Sierra Alpha Home Lab visual polish.
+ * Lightweight CSS-only background; no third-party wallpaper request or
+ * externally hosted assets. Homepage owns the actual layout and widgets.
+ */
+body {
+  background:
+    radial-gradient(ellipse 48% 48% at 85% 7%, rgba(23, 110, 141, .27), transparent 90%),
+    radial-gradient(ellipse 38% 48% at 5% 78%, rgba(96, 52, 123, .22), transparent 85%),
+    linear-gradient(150deg, #081521 0%, #0a1422 48%, #141326 100%) !important;
+  background-attachment: fixed !important;
+}
+#page_container {
+  max-width: 1580px;
+}
+.service-card {
+  background: rgba(20, 35, 51, .73) !important;
+  border: 1px solid rgba(172, 208, 235, .12);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .14);
+  backdrop-filter: blur(9px);
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+.service-card:hover {
+  border-color: rgba(114, 202, 238, .5);
+  background: rgba(26, 48, 67, .88) !important;
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .service-card { transition: none; }
+  .service-card:hover { transform: none; }
+}
