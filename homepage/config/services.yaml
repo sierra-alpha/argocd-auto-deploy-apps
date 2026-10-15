@@ -1,39 +1,64 @@
-# Every service card has a real href; avoid placeholder tiles that cannot be clicked.
-# Native API widgets (Argo CD, Audiobookshelf, etc.) are handled by the related
-# AI Whisperer integrations job #65, including secrets and access control.
-- Household:
+# Use source-verified LAN/internal destinations; reachability depends on LAN/Tailscale.
+# The green siteMonitor dot is merely an HTTP response, not a full health check.
+# Don't use siteMonitor on sites needing auth, unreachable via cluster networking,
+# or non-HTTP endpoints. Gatus is the authoritative uptime overview.
+- Media & Household:
     - Audiobookshelf:
         icon: audiobookshelf.png
         href: https://audiobookshelf.app.sierraalpha.co.nz
-        description: Audiobooks, podcasts and listening
-        siteMonitor: https://audiobookshelf.app.sierraalpha.co.nz
-- Infrastructure:
-    - Argo CD:
-        icon: argo-cd.png
-        href: https://argocd.app.sierraalpha.co.nz
-        description: GitOps applications and sync status
-        siteMonitor: https://argocd.app.sierraalpha.co.nz
-    - Kubernetes:
-        icon: kubernetes.png
-        href: https://argocd.app.sierraalpha.co.nz/settings/clusters
-        description: Cluster configuration in Argo CD
-    - Homepage:
-        icon: homepage.png
-        href: https://homepage.app.sierraalpha.co.nz
-        description: Home lab launchpad
-        siteMonitor: https://homepage.app.sierraalpha.co.nz
-- Observability:
+        description: Podcasts, audiobooks & listening
+    - Snapweb:
+        icon: snapcast.png
+        href: http://mediasomniac.sierraalpha.co.nz:1780
+        description: Snapcast audio groups and playback
+    - TTSer:
+        icon: mdi-text-to-speech
+        href: https://github.com/sierra-alpha/argocd-auto-deploy-apps/blob/main/audiobookshelf/audiobookshelf.yaml
+        description: Podcast TTS pipeline configuration (no web UI)
+- Monitoring & Health:
+    - Beszel:
+        icon: beszel.png
+        href: http://rampidv1-2--1.sierraalpha.co.nz:8090
+        description: Host CPU, RAM, disks & uptime
+    - Gatus:
+        icon: gatus.png
+        href: http://rampidv1-2--1.sierraalpha.co.nz:8080
+        description: Service availability and alerts
     - Grafana:
         icon: grafana.png
         href: https://grafana.app.sierraalpha.co.nz
-        description: Metrics, dashboards and observability
-        siteMonitor: https://grafana.app.sierraalpha.co.nz
-- Automation:
+        description: Dashboards and metrics
+- Infrastructure & Storage:
+    - MikroTik:
+        icon: mikrotik.png
+        href: http://192.168.0.1
+        description: Router administration (LAN)
+    - Argo CD:
+        icon: argo-cd.png
+        href: https://argocd.app.sierraalpha.co.nz
+        description: Kubernetes GitOps application status
+    - MinIO:
+        icon: minio.png
+        href: https://minio1.obs.sierraalpha.co.nz:9001
+        description: Object storage console (LAN)
+    - Kubernetes:
+        icon: kubernetes.png
+        href: https://argocd.app.sierraalpha.co.nz/settings/clusters
+        description: Cluster details in Argo CD
+    - Homepage:
+        icon: homepage.png
+        href: https://homepage.app.sierraalpha.co.nz
+        description: Home lab service directory
+- Automation & GitOps:
     - AI Whisperer:
         icon: github.png
         href: https://github.com/sierra-alpha/ai-whisperer
-        description: Autonomous jobs, worker queue and pull requests
-    - Deployment configuration:
+        description: Autonomous jobs and PRs
+    - Infrastructure as code:
+        icon: github.png
+        href: https://github.com/sierra-alpha/salt-setup
+        description: Ansible-managed machines and services
+    - Kubernetes manifests:
         icon: github.png
         href: https://github.com/sierra-alpha/argocd-auto-deploy-apps
-        description: Kubernetes and Argo CD manifests
+        description: Argo CD deployment configuration
