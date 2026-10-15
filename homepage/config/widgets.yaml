@@ -1,21 +1,9 @@
-- resources:
-    cpu: true
-    memory: true
-    disk: /
+# The resource widget reads the Homepage *container*, not the physical host.
+# Avoid misleading figures for CPU/RAM/disk; Beszel provides host-level metrics.
+# Kubernetes node percentages in this header were densely packed and unlabeled.
 - datetime:
     text_size: md
     format:
-      dateStyle: long
+      dateStyle: full
       timeStyle: short
       hour12: false
-- kubernetes:
-    cluster:
-      show: true
-      cpu: true
-      memory: true
-      showLabel: true
-      label: Cluster
-    nodes:
-      show: true
-      cpu: true
-      memory: true
