@@ -34,8 +34,8 @@
         description: Dashboards and metrics
     - tutei (NVR):
         icon: frigate.png
-        href: http://rampidv1-2--1.sierraalpha.co.nz:8080
-        description: Frigate camera host — view health in Gatus
+        href: https://tutei.sierraalpha.co.nz
+        description: Frigate cameras and NVR
 - Infrastructure & Storage:
     - MikroTik:
         icon: mikrotik.png
