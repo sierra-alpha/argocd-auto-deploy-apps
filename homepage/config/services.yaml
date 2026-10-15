@@ -1,23 +1,39 @@
+# Every service card has a real href; avoid placeholder tiles that cannot be clicked.
+# Native API widgets (Argo CD, Audiobookshelf, etc.) are handled by the related
+# AI Whisperer integrations job #65, including secrets and access control.
 - Household:
     - Audiobookshelf:
         icon: audiobookshelf.png
         href: https://audiobookshelf.app.sierraalpha.co.nz
-        description: Audiobooks and podcasts
+        description: Audiobooks, podcasts and listening
+        siteMonitor: https://audiobookshelf.app.sierraalpha.co.nz
 - Infrastructure:
     - Argo CD:
         icon: argo-cd.png
         href: https://argocd.app.sierraalpha.co.nz
-        description: GitOps deployments
+        description: GitOps applications and sync status
+        siteMonitor: https://argocd.app.sierraalpha.co.nz
     - Kubernetes:
         icon: kubernetes.png
         href: https://argocd.app.sierraalpha.co.nz/settings/clusters
-        description: Cluster workloads
+        description: Cluster configuration in Argo CD
+    - Homepage:
+        icon: homepage.png
+        href: https://homepage.app.sierraalpha.co.nz
+        description: Home lab launchpad
+        siteMonitor: https://homepage.app.sierraalpha.co.nz
 - Observability:
     - Grafana:
         icon: grafana.png
-        description: Metrics and dashboards
+        href: https://grafana.app.sierraalpha.co.nz
+        description: Metrics, dashboards and observability
+        siteMonitor: https://grafana.app.sierraalpha.co.nz
 - Automation:
     - AI Whisperer:
         icon: github.png
         href: https://github.com/sierra-alpha/ai-whisperer
-        description: Tasks and pull requests
+        description: Autonomous jobs, worker queue and pull requests
+    - Deployment configuration:
+        icon: github.png
+        href: https://github.com/sierra-alpha/argocd-auto-deploy-apps
+        description: Kubernetes and Argo CD manifests
