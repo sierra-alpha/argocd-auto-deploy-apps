@@ -1,28 +1,26 @@
 /*
- * Sierra Alpha Home Lab visual polish.
- * Lightweight CSS-only background; no third-party wallpaper request or
- * externally hosted assets. Homepage owns the actual layout and widgets.
+ * Comfortable, intentionally denser Homepage landing page.
+ * Scoped to homepage; no external assets, scripts, or credentials.
  */
 body {
   background:
-    radial-gradient(ellipse 48% 48% at 85% 7%, rgba(23, 110, 141, .27), transparent 90%),
-    radial-gradient(ellipse 38% 48% at 5% 78%, rgba(96, 52, 123, .22), transparent 85%),
-    linear-gradient(150deg, #081521 0%, #0a1422 48%, #141326 100%) !important;
+    radial-gradient(ellipse 53% 48% at 82% 4%, rgba(29, 111, 135, .34), transparent 85%),
+    radial-gradient(ellipse 41% 51% at 4% 94%, rgba(105, 55, 112, .29), transparent 84%),
+    linear-gradient(146deg, #06121b 0%, #0b1925 54%, #171527 100%) !important;
   background-attachment: fixed !important;
 }
-#page_container {
-  max-width: 1580px;
-}
+#page_container { max-width: 1450px; }
 .service-card {
-  background: rgba(20, 35, 51, .73) !important;
-  border: 1px solid rgba(172, 208, 235, .12);
-  box-shadow: 0 8px 26px rgba(0, 0, 0, .14);
-  backdrop-filter: blur(9px);
-  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+  background: rgba(19, 35, 51, .88) !important;
+  border: 1px solid rgba(150, 195, 224, .15);
+  border-radius: 12px;
+  box-shadow: 0 7px 24px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(7px);
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
 }
 .service-card:hover {
-  border-color: rgba(114, 202, 238, .5);
-  background: rgba(26, 48, 67, .88) !important;
+  background: rgba(35, 59, 76, .97) !important;
+  border-color: rgba(104, 201, 240, .56);
   transform: translateY(-2px);
 }
 @media (prefers-reduced-motion: reduce) {

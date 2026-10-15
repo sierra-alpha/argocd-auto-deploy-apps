@@ -1,24 +1,26 @@
-title: Sierra Alpha | Home Lab
+title: Sierra Alpha Home Lab
 theme: dark
 color: slate
 target: _blank
 headerStyle: boxed
 statusStyle: dot
 useEqualHeights: true
+maxGroupColumns: 3
+fiveColumns: false
 layout:
-  Household:
+  Media & Household:
     icon: mdi-home-heart
     style: row
     columns: 3
-  Infrastructure:
+  Monitoring & Health:
+    icon: mdi-heart-pulse
+    style: row
+    columns: 3
+  Infrastructure & Storage:
     icon: mdi-server-network
     style: row
     columns: 3
-  Observability:
-    icon: mdi-chart-areaspline
-    style: row
-    columns: 3
-  Automation:
+  Automation & GitOps:
     icon: mdi-robot-outline
     style: row
     columns: 3
