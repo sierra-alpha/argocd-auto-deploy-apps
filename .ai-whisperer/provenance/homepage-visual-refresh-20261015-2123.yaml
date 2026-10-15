@@ -1,0 +1,5 @@
+version: 1
+job_id: homepage-visual-refresh-20261015-2123
+control_repository: sierra-alpha/ai-whisperer
+control_job_url: https://github.com/sierra-alpha/ai-whisperer/pull/79
+created_at: '2026-10-15T08:27:23Z'
