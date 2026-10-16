@@ -7,13 +7,14 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlparse, urlunparse
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, Response
 
 ORIGIN = os.getenv("RSS_UPSTREAM_ORIGIN", "http://audiobookshelf.audiobookshelf.svc.cluster.local").rstrip("/")
 PUBLIC_ORIGIN = os.getenv("PODSORT_PUBLIC_ORIGIN", "https://podsort.app.sierraalpha.co.nz").rstrip("/")
+PUBLIC_AUDIOBOOKSHELF_ORIGIN = os.getenv("PUBLIC_AUDIOBOOKSHELF_ORIGIN", "https://audiobookshelf.app.sierraalpha.co.nz").rstrip("/")
 API_TOKEN = os.getenv("AUDIOBOOKSHELF_API_TOKEN", "")
 MAX_BYTES = 16 * 1024 * 1024
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
@@ -45,6 +46,18 @@ def publication_date(item):
         return None
 
 
+def public_enclosure_url(url):
+    """Expose only Audiobookshelf feed media through its public origin."""
+    if not isinstance(url, str):
+        return url
+    parsed = urlparse(url)
+    upstream = urlparse(ORIGIN)
+    if parsed.scheme == upstream.scheme and parsed.netloc == upstream.netloc and parsed.path.startswith("/feed/"):
+        public = urlparse(PUBLIC_AUDIOBOOKSHELF_ORIGIN)
+        return urlunparse((public.scheme, public.netloc, parsed.path, parsed.params, parsed.query, parsed.fragment))
+    return url
+
+
 def sort_feed(data):
     """Sort RSS items newest first; keep metadata, GUIDs and enclosures intact."""
     root = ET.fromstring(data)
@@ -59,6 +72,10 @@ def sort_feed(data):
             channel.remove(item)
         for index, item in enumerate(items):
             channel.insert(first + index, item)
+    for enclosure in channel.findall("item/enclosure"):
+        url = enclosure.get("url")
+        if url:
+            enclosure.set("url", public_enclosure_url(url))
     return ET.tostring(root, encoding="utf-8", xml_declaration=True)
 
 
