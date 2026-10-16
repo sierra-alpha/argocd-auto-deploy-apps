@@ -1,0 +1,125 @@
+"""Podsort: Audiobookshelf RSS chronology proxy and server-rendered feed directory."""
+import email.utils
+import html
+import os
+import re
+import urllib.error
+import urllib.request
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from urllib.parse import quote, urlparse
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, Response
+
+ORIGIN = os.getenv("RSS_UPSTREAM_ORIGIN", "http://audiobookshelf.audiobookshelf.svc.cluster.local").rstrip("/")
+PUBLIC_ORIGIN = os.getenv("PODSORT_PUBLIC_ORIGIN", "https://podsort.app.sierraalpha.co.nz").rstrip("/")
+API_TOKEN = os.getenv("AUDIOBOOKSHELF_API_TOKEN", "")
+MAX_BYTES = 16 * 1024 * 1024
+SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+
+def fetch(path, *, authenticated=False, accept="application/json"):
+    headers = {"Accept": accept}
+    if authenticated:
+        if not API_TOKEN:
+            raise ValueError("Missing Audiobookshelf API token")
+        headers["Authorization"] = "Bearer " + API_TOKEN
+    req = urllib.request.Request(ORIGIN + path, headers=headers)
+    with urllib.request.urlopen(req, timeout=15) as res:
+        data = res.read(MAX_BYTES + 1)
+        if len(data) > MAX_BYTES:
+            raise ValueError("Upstream response too large")
+        return data
+
+
+def publication_date(item):
+    raw = item.findtext("pubDate")
+    if not raw:
+        return None
+    try:
+        date = email.utils.parsedate_to_datetime(raw)
+        return (date.replace(tzinfo=timezone.utc) if date.tzinfo is None else date).astimezone(timezone.utc)
+    except (TypeError, ValueError, IndexError):
+        return None
+
+
+def sort_feed(data):
+    """Sort RSS items newest first; keep metadata, GUIDs and enclosures intact."""
+    root = ET.fromstring(data)
+    channel = root.find("channel")
+    if channel is None:
+        raise ValueError("RSS channel missing")
+    items = channel.findall("item")
+    if items:
+        first = list(channel).index(items[0])
+        items.sort(key=lambda item: publication_date(item) or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+        for item in items:
+            channel.remove(item)
+        for index, item in enumerate(items):
+            channel.insert(first + index, item)
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def discover_feeds():
+    import json
+    result = json.loads(fetch("/api/feeds", authenticated=True))
+    if not isinstance(result, dict) or not isinstance(result.get("minified"), list):
+        raise ValueError("Unexpected Audiobookshelf feed list")
+    return result["minified"]
+
+
+def feed_details(feed):
+    """Extract a safe public feed slug and title from Audiobookshelf's minified API."""
+    if not isinstance(feed, dict):
+        return None
+    feed_url = feed.get("feedUrl")
+    if not isinstance(feed_url, str):
+        return None
+    path = urlparse(feed_url).path
+    match = re.fullmatch(r"/feed/([A-Za-z0-9][A-Za-z0-9_-]{0,127})/?", path)
+    if not match:
+        return None
+    meta = feed.get("meta")
+    title = meta.get("title") if isinstance(meta, dict) else None
+    return match.group(1), title if isinstance(title, str) and title else match.group(1)
+
+
+@app.get("/healthz")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/", response_class=HTMLResponse)
+def homepage():
+    try:
+        feeds = discover_feeds()
+    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+        raise HTTPException(status_code=502, detail="Audiobookshelf feed discovery unavailable") from exc
+    rows = []
+    for feed in feeds:
+        details = feed_details(feed)
+        if details is None:
+            continue
+        slug, name = details
+        title = html.escape(name)
+        url = PUBLIC_ORIGIN + "/feed/" + quote(slug)
+        rows.append(f'<li><strong>{title}</strong><div><a href="{html.escape(url, quote=True)}">{html.escape(url)}</a></div></li>')
+    body = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podsort</title><style>body{font:1rem system-ui,sans-serif;max-width:48rem;margin:3rem auto;padding:0 1rem;background:#101827;color:#edf2fa}
+a{color:#9cd5ff;overflow-wrap:anywhere}li{background:#202c3f;padding:1.2rem;margin:1rem 0;border-radius:.75rem;list-style:none}
+ul{padding:0}li div{margin-top:.5rem}p{color:#bac7d9}</style></head><body>
+<h1>Podsort</h1><p>Audiobookshelf feeds, newest episodes first. Copy a link into your podcast player.</p><ul>""" + "".join(rows) + "</ul></body></html>"
+    return HTMLResponse(body, headers={"Cache-Control": "no-store"})
+
+
+@app.get("/feed/{slug}")
+def feed(slug: str):
+    if not SLUG.fullmatch(slug):
+        raise HTTPException(status_code=404, detail="Unknown feed")
+    try:
+        output = sort_feed(fetch("/feed/" + quote(slug), accept="application/rss+xml"))
+    except (urllib.error.URLError, TimeoutError, ValueError, ET.ParseError) as exc:
+        raise HTTPException(status_code=502, detail="Audiobookshelf RSS unavailable") from exc
+    return Response(content=output, media_type="application/rss+xml", headers={"Cache-Control": "public, max-age=180"})

@@ -1,0 +1,5 @@
+version: 1
+job_id: audiobookshelf-rss-chronology-20261016
+control_repository: sierra-alpha/ai-whisperer
+control_job_url: https://github.com/sierra-alpha/ai-whisperer/pull/83
+created_at: 2026-10-16T00:00:00Z
