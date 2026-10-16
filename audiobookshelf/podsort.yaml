@@ -30,6 +30,7 @@ spec:
             - {name: PYTHONPATH, value: /app:/tmp/python-deps}
             - {name: RSS_UPSTREAM_ORIGIN, value: http://audiobookshelf.audiobookshelf.svc.cluster.local}
             - {name: PODSORT_PUBLIC_ORIGIN, value: https://podsort.app.sierraalpha.co.nz}
+            - {name: PUBLIC_AUDIOBOOKSHELF_ORIGIN, value: https://audiobookshelf.app.sierraalpha.co.nz}
             - name: AUDIOBOOKSHELF_API_TOKEN
               valueFrom: {secretKeyRef: {name: podsort-audiobookshelf, key: api-token}}
           ports: [{containerPort: 8080}]

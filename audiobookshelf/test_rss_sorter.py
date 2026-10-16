@@ -48,6 +48,12 @@ class FeedSortingTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual([i.findtext("guid") for i in ET.fromstring(response.content).findall("./channel/item")], ["new", "old"])
 
+    def test_enclosure_is_rewritten_to_public_audiobookshelf(self):
+        xml = b"<rss><channel><item><guid>stable-guid</guid><enclosure url='http://audiobookshelf.audiobookshelf.svc.cluster.local/feed/a/item/b/media.wav'/></item></channel></rss>"
+        item = ET.fromstring(sort_feed(xml)).find("./channel/item")
+        self.assertEqual(item.find("enclosure").get("url"), "https://audiobookshelf.app.sierraalpha.co.nz/feed/a/item/b/media.wav")
+        self.assertEqual(item.findtext("guid"), "stable-guid")
+
 
 if __name__ == "__main__":
     unittest.main()
