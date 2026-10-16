@@ -7,7 +7,7 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, Response
@@ -70,6 +70,22 @@ def discover_feeds():
     return result["minified"]
 
 
+def feed_details(feed):
+    """Extract a safe public feed slug and title from Audiobookshelf's minified API."""
+    if not isinstance(feed, dict):
+        return None
+    feed_url = feed.get("feedUrl")
+    if not isinstance(feed_url, str):
+        return None
+    path = urlparse(feed_url).path
+    match = re.fullmatch(r"/feed/([A-Za-z0-9][A-Za-z0-9_-]{0,127})/?", path)
+    if not match:
+        return None
+    meta = feed.get("meta")
+    title = meta.get("title") if isinstance(meta, dict) else None
+    return match.group(1), title if isinstance(title, str) and title else match.group(1)
+
+
 @app.get("/healthz")
 def health():
     return {"status": "ok"}
@@ -83,10 +99,11 @@ def homepage():
         raise HTTPException(status_code=502, detail="Audiobookshelf feed discovery unavailable") from exc
     rows = []
     for feed in feeds:
-        slug = feed.get("slug", "")
-        if not isinstance(slug, str) or not SLUG.fullmatch(slug):
+        details = feed_details(feed)
+        if details is None:
             continue
-        title = html.escape(str(feed.get("title") or feed.get("name") or slug))
+        slug, name = details
+        title = html.escape(name)
         url = PUBLIC_ORIGIN + "/feed/" + quote(slug)
         rows.append(f'<li><strong>{title}</strong><div><a href="{html.escape(url, quote=True)}">{html.escape(url)}</a></div></li>')
     body = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

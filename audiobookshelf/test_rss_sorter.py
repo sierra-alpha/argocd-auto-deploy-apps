@@ -3,7 +3,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from unittest.mock import patch
 
-from rss_sorter import app, sort_feed, SLUG
+from rss_sorter import app, sort_feed, SLUG, feed_details
 
 
 class FeedSortingTests(unittest.TestCase):
@@ -25,11 +25,20 @@ class FeedSortingTests(unittest.TestCase):
 
     def test_homepage_discovery(self):
         from fastapi.testclient import TestClient
-        with patch("rss_sorter.discover_feeds", return_value=[{"slug": "my-podcast", "title": "<Podcast>"}]):
+        feeds = [
+            {"feedUrl": "https://audiobookshelf.example/feed/my-podcast", "meta": {"title": "<Podcast>"}},
+            {"feedUrl": "https://audiobookshelf.example/feed/../bad", "meta": {"title": "ignored"}},
+            {"feedUrl": None, "meta": {"title": "ignored"}},
+        ]
+        with patch("rss_sorter.discover_feeds", return_value=feeds):
             response = TestClient(app).get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("/feed/my-podcast", response.text)
         self.assertIn("&lt;Podcast&gt;", response.text)
+
+    def test_minified_feed_requires_feed_url_path_and_meta_title(self):
+        self.assertEqual(feed_details({"feedUrl": "https://abs.test/feed/valid_slug-1", "meta": {"title": "Shown"}}), ("valid_slug-1", "Shown"))
+        self.assertIsNone(feed_details({"feedUrl": "https://abs.test/api/feeds", "meta": {"title": "No"}}))
 
     def test_feed_endpoint(self):
         from fastapi.testclient import TestClient
