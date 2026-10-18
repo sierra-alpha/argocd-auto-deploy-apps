@@ -1,0 +1,213 @@
+---
+# Source: warpgate/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: warpgate
+  labels:
+    helm.sh/chart: warpgate-0.1.0
+    app.kubernetes.io/name: warpgate
+    app.kubernetes.io/instance: warpgate
+    app.kubernetes.io/version: "0.29.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: warpgate/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: warpgate-config-overrides
+  labels:
+    helm.sh/chart: warpgate-0.1.0
+    app.kubernetes.io/name: warpgate
+    app.kubernetes.io/instance: warpgate
+    app.kubernetes.io/version: "0.29.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  warpgate.yaml: |
+
+    database_url: sqlite:/data/db
+    http:
+      listen: "0.0.0.0:8888"
+      certificate: /data/tls.certificate.pem
+      key: /data/tls.key.pem
+    ssh:
+      enable: true
+      listen: "0.0.0.0:2222"
+    mysql:
+      enable: false
+    postgres:
+      enable: false
+    kubernetes:
+      enable: false
+    rdp:
+      enable: false
+    vnc:
+      enable: false
+    recordings:
+      enable: true
+      path: /data/recordings
+---
+# Source: warpgate/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: warpgate
+  labels:
+    helm.sh/chart: warpgate-0.1.0
+    app.kubernetes.io/name: warpgate
+    app.kubernetes.io/instance: warpgate
+    app.kubernetes.io/version: "0.29.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2222
+      targetPort: ssh
+      protocol: TCP
+      name: ssh
+    - port: 8888
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: warpgate
+    app.kubernetes.io/instance: warpgate
+---
+# Source: warpgate/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: warpgate
+  labels:
+    helm.sh/chart: warpgate-0.1.0
+    app.kubernetes.io/name: warpgate
+    app.kubernetes.io/instance: warpgate
+    app.kubernetes.io/version: "0.29.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: warpgate
+      app.kubernetes.io/instance: warpgate
+  template:
+    metadata:
+      annotations:
+        checksum/config: c7a1e7f29154e69a89dc5b8bff36bfc8dab5204c2ea0682db7c6b614c4097404
+      labels:
+        helm.sh/chart: warpgate-0.1.0
+        app.kubernetes.io/name: warpgate
+        app.kubernetes.io/instance: warpgate
+        app.kubernetes.io/version: "0.29.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: warpgate
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: warpgate-setup
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          image: "ghcr.io/warp-tech/warpgate:0.29.2"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+
+              # For legacy installs that include SSH key files on disk - current version generates and stores keys in the DB
+              if [ -d /ssh-keys ]; then
+                mkdir -p /data/ssh-keys
+                cp /ssh-keys/client-ed25519 /ssh-keys/client-rsa /ssh-keys/host-ed25519 /ssh-keys/host-rsa /data/ssh-keys/
+                chmod -R 600 /data/ssh-keys/*
+              fi
+
+              # After setup: unattended-setup writes a self-signed cert unconditionally,
+              # so the provided cert must be copied in afterwards to take effect.
+              if [ -d /tls-cert ]; then
+                cp /tls-cert/tls.crt /data/tls.certificate.pem
+                cp /tls-cert/tls.key /data/tls.key.pem
+                chmod 600 /data/tls.certificate.pem
+                chmod 600 /data/tls.key.pem
+              fi
+
+              if [ -d /override ]; then
+                cp /override/warpgate.yaml /data/warpgate.yaml
+                chmod 600 /data/warpgate.yaml
+              fi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tls-cert
+              mountPath: /tls-cert
+            - name: override-config
+              mountPath: /override
+            - mountPath: /tmp
+              name: tmp
+      containers:
+        - name: warpgate
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          image: "ghcr.io/warp-tech/warpgate:0.29.2"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: WARPGATE_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: warpgate-encryption
+                  key: encryptionKey
+          command:
+            - warpgate
+            - -c
+            - /data/warpgate.yaml
+            - run
+          ports:
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+            - name: http
+              containerPort: 8888
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+            - name: data
+              mountPath: /data
+      volumes:
+        - emptyDir:
+            sizeLimit: 64Mi
+          name: tmp
+        - name: tls-cert
+          secret:
+            secretName: warpgate-tls
+        - name: override-config
+          configMap:
+            name: warpgate-config-overrides
+        - name: data
+          persistentVolumeClaim:
+            claimName: warpgate-data

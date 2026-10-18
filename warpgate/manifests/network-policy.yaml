@@ -1,0 +1,10 @@
+# Deliberately no allows until reviewed Tailscale proxy and TEST target are known.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: warpgate-default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress: []

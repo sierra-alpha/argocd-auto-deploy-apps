@@ -1,0 +1,90 @@
+# Review-only PoC. Never raise replicas until README.md gates are satisfied.
+fullnameOverride: warpgate
+replicaCount: 0
+image:
+  repository: ghcr.io/warp-tech/warpgate
+  tag: "0.29.2"
+  pullPolicy: IfNotPresent
+setup:
+  enabled: false
+  envFromSecret: null
+  ssh: 2222
+  http: 8888
+  mysql: 0
+  pgsql: 0
+  kubernetes: 0
+postgresql:
+  enabled: false
+# Existing externally provisioned Secrets; no Secret values or generators in Git.
+tls_cert_secret: warpgate-tls
+envFromSecret:
+  WARPGATE_ENCRYPTION_KEY: warpgate-encryption/encryptionKey
+serviceAccount:
+  create: true
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: [ALL]
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+data:
+  pvc:
+    enabled: true
+    # Provision and restore separately; Argo deletion must not delete gateway state.
+    claimName: warpgate-data
+service:
+  type: ClusterIP
+  annotations: {}
+  ports:
+    ssh: 2222
+    http: 8888
+    mysql: 0
+    pgsql: 0
+    kubernetes: 0
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+volumes:
+  - name: tmp
+    emptyDir:
+      sizeLimit: 64Mi
+volume_mounts:
+  - name: tmp
+    mountPath: /tmp
+overrides_config: |
+  database_url: sqlite:/data/db
+  http:
+    listen: "0.0.0.0:8888"
+    certificate: /data/tls.certificate.pem
+    key: /data/tls.key.pem
+  ssh:
+    enable: true
+    listen: "0.0.0.0:2222"
+  mysql:
+    enable: false
+  postgres:
+    enable: false
+  kubernetes:
+    enable: false
+  rdp:
+    enable: false
+  vnc:
+    enable: false
+  recordings:
+    enable: true
+    path: /data/recordings

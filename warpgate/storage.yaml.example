@@ -1,0 +1,12 @@
+# Not part of Kustomize; owner must choose backup-capable storage first.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: warpgate-data
+  namespace: warpgate
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: REPLACE_WITH_REVIEWED_STORAGE_CLASS
+  resources:
+    requests:
+      storage: 2Gi
