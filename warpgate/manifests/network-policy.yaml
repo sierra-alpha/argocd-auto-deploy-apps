@@ -36,3 +36,28 @@ spec:
           port: 8888
         - protocol: TCP
           port: 2222
+
+---
+# Permit the existing K3s Traefik ingress controller to reach ONLY the
+# Warpgate HTTPS backend. This does not open port 2222 to the LAN.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: warpgate-traefik-lan-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: warpgate
+      app.kubernetes.io/instance: warpgate
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+      ports:
+        - protocol: TCP
+          port: 8888

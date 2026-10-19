@@ -5,6 +5,7 @@ resources:
 - namespace.yaml
 - upstream.yaml
 - network-policy.yaml
+- lan-ingress.yaml
 - secrets.yaml
 - certificate.yaml
 - storage.yaml

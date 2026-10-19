@@ -1,0 +1,44 @@
+# LAN-only HTTPS entrypoint for the Warpgate ADMIN UI.
+# The existing Tailscale Service proxy remains the remote/SSH entrypoint.
+# Traefik must preserve the real client IP for this allowlist to be reliable.
+# Do not forward this ingress's 443 endpoint from the internet.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: warpgate-lan-only
+  namespace: warpgate
+spec:
+  ipAllowList:
+    sourceRange:
+      - 192.168.1.0/24
+---
+# Warpgate already terminates TLS with a cert-manager certificate for this
+# hostname. Verify the upstream certificate using its DNS SAN, not the pod IP.
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: warpgate-verified-upstream
+  namespace: warpgate
+spec:
+  serverName: warpgate.app.sierraalpha.co.nz
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: warpgate-lan
+  namespace: warpgate
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`warpgate.app.sierraalpha.co.nz`)
+      middlewares:
+        - name: warpgate-lan-only
+      services:
+        - name: warpgate
+          port: 443
+          scheme: https
+          serversTransport: warpgate-verified-upstream
+  tls:
+    secretName: warpgate-tls
