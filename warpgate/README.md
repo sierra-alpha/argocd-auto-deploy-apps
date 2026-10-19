@@ -78,12 +78,27 @@ The Service's Traefik annotations select HTTPS and reference the
 using `warpgate.app.sierraalpha.co.nz` as SNI. Do not disable TLS validation
 or redirect Traefik to Warpgate over plaintext port 8888.
 
-The `warpgate-lan-only` middleware preserves the existing `192.168.1.0/24`
-client allowlist (and requires Traefik to receive the real client IP).
-The NetworkPolicy allows `kube-system` Traefik pods to reach Warpgate's
-HTTPS port 8888, while Tailscale proxy pods continue serving HTTPS and SSH
-2222 through the original private Service. **SSH is not exposed by the LAN
-HTTP ingress.** No public ingress or Funnel is added.
+Just like Homepage, the active Ingress uses only
+`traefik-redirecthttps@kubernetescrd`. The previous
+`192.168.1.0/24` Traefik client-IP allowlist was rejecting legitimate
+LAN visitors with HTTP 403 (for example, a different client subnet or
+source-NAT at the ingress). It is **not attached to the active Ingress**.
+A legacy Middleware remains attached only to the retired
+`retired-warpgate-route.invalid` IngressRoute because ArgoCD automated
+pruning is disabled.
+
+The NetworkPolicy still allows only the `kube-system` Traefik pods to
+reach Warpgate's HTTPS port 8888, while Tailscale proxy pods continue
+serving HTTPS and SSH 2222 through the original private Service.
+**SSH is not exposed by the LAN HTTP ingress.**
+
+**Important: without the client-IP filter, the Warpgate login page is
+reachable by anyone who can connect to the existing Traefik listener
+with this hostname.** The LAN-only boundary must therefore be
+enforced by your router/firewall and Tailscale ACLs: confirm Traefik is
+not reachable from the WAN, including any port forward, public proxy,
+Funnel, or external tunnel. This was not verified live. Do not load
+production SSH credentials until it is verified.
 
 LAN DNS in `salt-setup/dns-server/dns-server.conf` maps
 `*.app.sierraalpha.co.nz` to `192.168.1.250` (rasomniac), the same
@@ -100,11 +115,11 @@ curl -I https://warpgate.app.sierraalpha.co.nz
 If you still see a **default nginx page**, first check that both requests
 resolve to the same address and that ArgoCD synced the new Kubernetes
 Ingress: `kubectl -n warpgate get ingress warpgate`.
-A 403 likely indicates that your real client IP isn't in
-`192.168.1.0/24`, or it is masked by a reverse proxy. A 502 may indicate
-backend HTTPS/SNI issues or NetworkPolicy endpoint labels; inspect Traefik
-and Warpgate logs. Don't widen the IP allowlist or disable TLS
-verification to work around either.
+A 403 after removing the ingress client-IP middleware can be issued
+by Warpgate itself or another ingress policy; inspect the response
+headers and Traefik logs to identify the rejecting component. A 502
+may indicate backend HTTPS/SNI issues or NetworkPolicy endpoint labels;
+inspect Traefik and Warpgate logs. Do not disable TLS verification.
 
 The old `warpgate-lan` **IngressRoute** is retained with a deliberately
 different `.invalid` hostname; ArgoCD's automated `prune: false` would

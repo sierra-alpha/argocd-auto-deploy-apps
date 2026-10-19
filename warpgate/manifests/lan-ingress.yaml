@@ -1,3 +1,7 @@
+# Match Homepage's working Ingress: the Warpgate HTTPS redirect is the only
+# middleware on the active route. In particular, do not attach the legacy
+# client-IP allowlist: in this setup it rejected legitimate LAN clients (403).
+# LAN-only reachability must be enforced outside Traefik (no WAN forward).
 # Same standard Kubernetes Ingress pattern used by homepage.
 # Local DNS resolves *.app.sierraalpha.co.nz to the existing Traefik ingress.
 # The existing Tailscale Service proxy remains available for tailnet HTTPS/SSH.
@@ -7,7 +11,7 @@ metadata:
   name: warpgate
   namespace: warpgate
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-redirecthttps@kubernetescrd,warpgate-warpgate-lan-only@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-redirecthttps@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
@@ -26,8 +30,9 @@ spec:
         - warpgate.app.sierraalpha.co.nz
       secretName: warpgate-tls
 ---
-# Restrict the standard LAN Ingress to the same local subnet as before.
-# Preserve the true client IP in Traefik; source-NAT can bypass source allowlists.
+# Legacy allowlist is retained only for the retired IngressRoute below.
+# The active Kubernetes Ingress above does NOT reference this Middleware.
+# Automated pruning is off; avoid removing resources without a safe cleanup.
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
