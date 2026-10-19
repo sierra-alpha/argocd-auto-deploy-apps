@@ -11,6 +11,7 @@ resources:
 - storage.yaml
 patches:
 - path: deployment-patch.yaml
+- path: service-patch.yaml
 - target:
     kind: ServiceAccount
     name: warpgate
