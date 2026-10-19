@@ -1,0 +1,38 @@
+# Deliberately no allows until reviewed Tailscale proxy and TEST target are known.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: warpgate-default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress: []
+---
+# Only this Service's dedicated Tailscale proxy may reach the listeners.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: warpgate-tailnet-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: warpgate
+      app.kubernetes.io/instance: warpgate
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tailscale
+          podSelector:
+            matchLabels:
+              tailscale.com/managed: "true"
+              tailscale.com/parent-resource-type: svc
+              tailscale.com/parent-resource: warpgate
+              tailscale.com/parent-resource-ns: warpgate
+      ports:
+        - protocol: TCP
+          port: 8888
+        - protocol: TCP
+          port: 2222

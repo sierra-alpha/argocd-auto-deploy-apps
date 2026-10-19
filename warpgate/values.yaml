@@ -1,0 +1,90 @@
+fullnameOverride: warpgate
+replicaCount: 1
+image:
+  repository: ghcr.io/warp-tech/warpgate
+  tag: 0.29.2
+  pullPolicy: IfNotPresent
+setup:
+  enabled: false
+  envFromSecret: null
+  ssh: 2222
+  http: 8888
+  mysql: 0
+  pgsql: 0
+  kubernetes: 0
+postgresql:
+  enabled: false
+tls_cert_secret: warpgate-tls
+envFromSecret:
+  WARPGATE_ENCRYPTION_KEY: warpgate/encryption-key
+serviceAccount:
+  create: true
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+    - ALL
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: '1'
+    memory: 512Mi
+data:
+  pvc:
+    enabled: true
+    claimName: warpgate-data
+service:
+  type: ClusterIP
+  annotations:
+    tailscale.com/expose: 'true'
+    tailscale.com/hostname: warpgate
+  ports:
+    ssh: 2222
+    http: 443
+    mysql: 0
+    pgsql: 0
+    kubernetes: 0
+ingress:
+  enabled: false
+httpRoute:
+  enabled: false
+volumes:
+- name: tmp
+  emptyDir:
+    sizeLimit: 64Mi
+volume_mounts:
+- name: tmp
+  mountPath: /tmp
+overrides_config: |
+  database_url: sqlite:/data/db
+  http:
+    listen: 0.0.0.0:8888
+    certificate: /tls-cert/tls.crt
+    key: /tls-cert/tls.key
+  ssh:
+    enable: true
+    listen: 0.0.0.0:2222
+  mysql:
+    enable: false
+  postgres:
+    enable: false
+  kubernetes:
+    enable: false
+  rdp:
+    enable: false
+  vnc:
+    enable: false
+  recordings:
+    enable: true
+    path: /data/recordings
