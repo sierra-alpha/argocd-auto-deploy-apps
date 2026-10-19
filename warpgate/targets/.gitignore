@@ -1,6 +1,6 @@
 # Never commit provider-generated state or plans; they may contain sensitive data.
+# Commit .terraform.lock.hcl after verified provider init to pin checksums.
 .terraform/
-.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 *.tfplan
