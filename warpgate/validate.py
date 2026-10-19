@@ -71,11 +71,14 @@ def check(d):
     assert lan['podSelector']==allow['podSelector']
     middleware=d['Middleware','warpgate-lan-only']
     assert middleware['apiVersion']=='traefik.io/v1alpha1'
+    assert middleware['metadata']['namespace']=='warpgate'
     assert middleware['spec']=={'ipAllowList':{'sourceRange':['192.168.1.0/24']}}
     transport=d['ServersTransport','warpgate-verified-upstream']
+    assert transport['metadata']['namespace']=='warpgate'
     assert transport['spec']=={'serverName':'warpgate.app.sierraalpha.co.nz'}
     route=d['IngressRoute','warpgate-lan']
     assert route['apiVersion']=='traefik.io/v1alpha1'
+    assert route['metadata']['namespace']=='warpgate'
     assert route['spec']=={
         'entryPoints':['websecure'],
         'routes':[{
