@@ -63,6 +63,40 @@ the PVC will remain pending. It is single-node storage, not HA or a backup.
 Quiesce the single writer before consistent PVC backups; retain the encryption
 key separately. The Argo PVC annotations disable automatic pruning/deletion.
 
+## LAN HTTPS access (alongside Tailscale)
+
+A dedicated Traefik `IngressRoute` now accepts **only HTTPS** on the existing
+`websecure` entrypoint for `warpgate.app.sierraalpha.co.nz`. The original
+Tailscale operator proxy still exposes HTTPS 443 and SSH 2222; no Service
+LoadBalancer/NodePort, public Funnel or router-port-forwarding is introduced.
+Traefik forwards HTTPS to the existing Warpgate port 443 and uses a
+`ServersTransport.serverName` matching the cert-manager certificate hostname
+to **verify** the backend TLS connection. No insecure TLS verification option.
+
+LAN DNS already maps `*.app.sierraalpha.co.nz` to
+`192.168.1.250` in the infrastructure repository's
+`dns-server/dns-server.conf`. When using the LAN resolver, opening
+`https://warpgate.app.sierraalpha.co.nz` should reach the K3s Traefik
+websecure listener. The LAN `Middleware` permits `192.168.1.0/24` only;
+update that CIDR **after review** if your client is in a different VLAN.
+The new NetworkPolicy authorizes traffic to Warpgate's HTTPS pod port
+`8888` only from the `kube-system` Traefik controller pods, leaving SSH
+private to the Tailscale proxy.
+
+**Do not publish this Traefik listener through the WAN or a public reverse
+proxy.** The IP allowlist checks Traefik's observed client IP; a source-NAT
+router, forwarded port, or proxy may hide the true client origin, so the
+allowlist alone is not sufficient proof that this is LAN-only. Preserve
+client source addresses and verify the router has no WAN forward for
+this route. From a device with no Tailscale, test that an external
+connection to this hostname cannot access Warpgate before placing
+privileged credentials behind it.
+
+On LAN you can use the **web administration UI only**. The LAN ingress does
+not expose raw SSH port `2222`; it remains accessible via the Tailscale
+operator. Don't point a public DNS record at the LAN Traefik proxy merely
+to make access work from a remote network.
+
 ## Gatus target: configure after login
 
 The UI can start without a Gatus SSH credential. Keep the current
