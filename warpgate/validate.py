@@ -57,6 +57,36 @@ def check(d):
     assert peer['namespaceSelector']['matchLabels']=={'kubernetes.io/metadata.name':'tailscale'}
     assert peer['podSelector']['matchLabels']=={'tailscale.com/managed':'true','tailscale.com/parent-resource-type':'svc','tailscale.com/parent-resource':'warpgate','tailscale.com/parent-resource-ns':'warpgate'}
     assert {p['port'] for p in rule['ports']}=={2222,8888}
+    # Only LAN clients through Traefik may reach the new web route.
+    # Tailnet access remains through its existing, separate Tailscale proxy.
+    lan=d['NetworkPolicy','warpgate-traefik-lan-ingress']['spec']
+    assert lan['policyTypes']==['Ingress']
+    lan_rule=lan['ingress'][0]
+    assert len(lan_rule['from'])==1
+    assert lan_rule['from'][0]=={
+        'namespaceSelector':{'matchLabels':{'kubernetes.io/metadata.name':'kube-system'}},
+        'podSelector':{'matchLabels':{'app.kubernetes.io/name':'traefik'}}
+    }
+    assert lan_rule['ports']==[{'protocol':'TCP','port':8888}]
+    assert lan['podSelector']==allow['podSelector']
+    middleware=d['Middleware','warpgate-lan-only']
+    assert middleware['apiVersion']=='traefik.io/v1alpha1'
+    assert middleware['spec']=={'ipAllowList':{'sourceRange':['192.168.1.0/24']}}
+    transport=d['ServersTransport','warpgate-verified-upstream']
+    assert transport['spec']=={'serverName':'warpgate.app.sierraalpha.co.nz'}
+    route=d['IngressRoute','warpgate-lan']
+    assert route['apiVersion']=='traefik.io/v1alpha1'
+    assert route['spec']=={
+        'entryPoints':['websecure'],
+        'routes':[{
+            'kind':'Rule',
+            'match':'Host(`warpgate.app.sierraalpha.co.nz`)',
+            'middlewares':[{'name':'warpgate-lan-only'}],
+            'services':[{'name':'warpgate','port':443,'scheme':'https',
+                         'serversTransport':'warpgate-verified-upstream'}]
+        }],
+        'tls':{'secretName':'warpgate-tls'}
+    }
     cfg=yaml.safe_load(d['ConfigMap','warpgate-config-overrides']['data']['warpgate.yaml'])
     assert cfg['http']['certificate']=='/tls-cert/tls.crt'
     assert cfg['http']['key']=='/tls-cert/tls.key'
@@ -87,6 +117,18 @@ class Activation(unittest.TestCase):
     def test_reject_blanket_ingress(self):
         d=copy.deepcopy(self.docs);d['NetworkPolicy','warpgate-tailnet-ingress']['spec']['ingress'][0]['from'][0]['podSelector']={}
         with self.assertRaises((AssertionError,KeyError)): check(d)
+    def test_reject_public_lan_allowlist(self):
+        d=copy.deepcopy(self.docs)
+        d['Middleware','warpgate-lan-only']['spec']['ipAllowList']['sourceRange']=['0.0.0.0/0']
+        with self.assertRaises(AssertionError): check(d)
+    def test_reject_lan_plaintext_backend(self):
+        d=copy.deepcopy(self.docs)
+        d['IngressRoute','warpgate-lan']['spec']['routes'][0]['services'][0]['scheme']='http'
+        with self.assertRaises(AssertionError): check(d)
+    def test_reject_traefik_access_to_ssh(self):
+        d=copy.deepcopy(self.docs)
+        d['NetworkPolicy','warpgate-traefik-lan-ingress']['spec']['ingress'][0]['ports'].append({'protocol':'TCP','port':2222})
+        with self.assertRaises(AssertionError): check(d)
     def test_reject_egress_open(self):
         d=copy.deepcopy(self.docs);d['NetworkPolicy','warpgate-default-deny']['spec']['egress']=[{}]
         with self.assertRaises(AssertionError): check(d)
