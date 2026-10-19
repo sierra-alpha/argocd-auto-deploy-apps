@@ -27,12 +27,12 @@ data:
 
     database_url: sqlite:/data/db
     http:
-      listen: "0.0.0.0:8888"
-      certificate: /data/tls.certificate.pem
-      key: /data/tls.key.pem
+      listen: 0.0.0.0:8888
+      certificate: /tls-cert/tls.crt
+      key: /tls-cert/tls.key
     ssh:
       enable: true
-      listen: "0.0.0.0:2222"
+      listen: 0.0.0.0:2222
     mysql:
       enable: false
     postgres:
@@ -58,6 +58,9 @@ metadata:
     app.kubernetes.io/instance: warpgate
     app.kubernetes.io/version: "0.29.0"
     app.kubernetes.io/managed-by: Helm
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: warpgate
 spec:
   type: ClusterIP
   ports:
@@ -65,7 +68,7 @@ spec:
       targetPort: ssh
       protocol: TCP
       name: ssh
-    - port: 8888
+    - port: 443
       targetPort: http
       protocol: TCP
       name: http
@@ -85,7 +88,7 @@ metadata:
     app.kubernetes.io/version: "0.29.0"
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: warpgate
@@ -93,7 +96,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: c7a1e7f29154e69a89dc5b8bff36bfc8dab5204c2ea0682db7c6b614c4097404
+        checksum/config: 18be3b538bb8676010b7acee30ca0c148a093027a50968d22bc123fe9ec4e997
       labels:
         helm.sh/chart: warpgate-0.1.0
         app.kubernetes.io/name: warpgate
@@ -172,8 +175,8 @@ spec:
             - name: WARPGATE_ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
-                  name: warpgate-encryption
-                  key: encryptionKey
+                  name: warpgate
+                  key: encryption-key
           command:
             - warpgate
             - -c

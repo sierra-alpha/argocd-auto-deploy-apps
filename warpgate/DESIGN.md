@@ -1,5 +1,11 @@
 # Placement, HA and phone approval design
 
+Update: the owner subsequently approved activating the single-instance trial and
+merging it, with secrets supplied later through 1Password and the existing Gatus
+`readonly-audit` account retained. Its sudo boundary risk was explicitly accepted.
+The current deployment and remaining private-DNS/target-connectivity steps are
+in README.md; references below to the disabled proposal describe the initial plan.
+
 Research snapshot: 2026-10-18 UTC. This is a proposal, not a live inventory or
 permission to change hosts. Local `salt-setup` checkout at
 `6ff36e42a36c71928cf403047235380474041230` was read only. No SSH, Ansible,

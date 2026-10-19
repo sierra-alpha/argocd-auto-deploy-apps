@@ -1,9 +1,8 @@
-# Review-only PoC. Never raise replicas until README.md gates are satisfied.
 fullnameOverride: warpgate
-replicaCount: 0
+replicaCount: 1
 image:
   repository: ghcr.io/warp-tech/warpgate
-  tag: "0.29.2"
+  tag: 0.29.2
   pullPolicy: IfNotPresent
 setup:
   enabled: false
@@ -15,10 +14,9 @@ setup:
   kubernetes: 0
 postgresql:
   enabled: false
-# Existing externally provisioned Secrets; no Secret values or generators in Git.
 tls_cert_secret: warpgate-tls
 envFromSecret:
-  WARPGATE_ENCRYPTION_KEY: warpgate-encryption/encryptionKey
+  WARPGATE_ENCRYPTION_KEY: warpgate/encryption-key
 serviceAccount:
   create: true
 podSecurityContext:
@@ -33,25 +31,27 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   capabilities:
-    drop: [ALL]
+    drop:
+    - ALL
 resources:
   requests:
     cpu: 100m
     memory: 128Mi
   limits:
-    cpu: "1"
+    cpu: '1'
     memory: 512Mi
 data:
   pvc:
     enabled: true
-    # Provision and restore separately; Argo deletion must not delete gateway state.
     claimName: warpgate-data
 service:
   type: ClusterIP
-  annotations: {}
+  annotations:
+    tailscale.com/expose: 'true'
+    tailscale.com/hostname: warpgate
   ports:
     ssh: 2222
-    http: 8888
+    http: 443
     mysql: 0
     pgsql: 0
     kubernetes: 0
@@ -60,21 +60,21 @@ ingress:
 httpRoute:
   enabled: false
 volumes:
-  - name: tmp
-    emptyDir:
-      sizeLimit: 64Mi
+- name: tmp
+  emptyDir:
+    sizeLimit: 64Mi
 volume_mounts:
-  - name: tmp
-    mountPath: /tmp
+- name: tmp
+  mountPath: /tmp
 overrides_config: |
   database_url: sqlite:/data/db
   http:
-    listen: "0.0.0.0:8888"
-    certificate: /data/tls.certificate.pem
-    key: /data/tls.key.pem
+    listen: 0.0.0.0:8888
+    certificate: /tls-cert/tls.crt
+    key: /tls-cert/tls.key
   ssh:
     enable: true
-    listen: "0.0.0.0:2222"
+    listen: 0.0.0.0:2222
   mysql:
     enable: false
   postgres:

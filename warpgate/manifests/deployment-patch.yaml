@@ -3,42 +3,92 @@ kind: Deployment
 metadata:
   name: warpgate
 spec:
-  # A shared SQLite PVC must never be opened by overlapping rollout replicas.
   strategy:
     type: Recreate
   template:
     spec:
       automountServiceAccountToken: false
       initContainers:
-        - name: warpgate-setup
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
+      - name: warpgate-setup
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        env:
+        - name: WARPGATE_NEW_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: warpgate
+              key: password
+        - name: WARPGATE_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: warpgate
+              key: encryption-key
+        - name: WARPGATE_ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: warpgate
+              key: username
+        command:
+        - /bin/sh
+        - -ec
+        - |
+          : "${WARPGATE_ADMIN_USERNAME:?Admin username must not be empty}"
+          : "${WARPGATE_NEW_USER_PASSWORD:?Admin password must not be empty}"
+          : "${WARPGATE_ENCRYPTION_KEY:?Encryption key must not be empty}"
+          umask 077
+          cp /override/warpgate.yaml /data/warpgate.yaml
+          warpgate -c /data/warpgate.yaml create-user --role warpgate:admin "$WARPGATE_ADMIN_USERNAME"
       containers:
-        - name: warpgate
-          startupProbe:
-            httpGet:
-              scheme: HTTPS
-              path: /@warpgate/api/info
-              port: http
-            periodSeconds: 5
-            failureThreshold: 30
-          readinessProbe:
-            httpGet:
-              scheme: HTTPS
-              path: /@warpgate/api/info
-              port: http
-            periodSeconds: 10
-            timeoutSeconds: 3
-          livenessProbe:
-            httpGet:
-              scheme: HTTPS
-              path: /@warpgate/api/info
-              port: http
-            periodSeconds: 20
-            timeoutSeconds: 3
-            failureThreshold: 3
+      - name: warpgate
+        startupProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /@warpgate/api/info
+            port: http
+          periodSeconds: 5
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /@warpgate/api/info
+            port: http
+          periodSeconds: 10
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /@warpgate/api/info
+            port: http
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: tls-cert
+          mountPath: /tls-cert
+          readOnly: true
+        command:
+        - /bin/sh
+        - -ec
+        - |
+          : "${WARPGATE_ENCRYPTION_KEY:?Encryption key must not be empty}"
+          tls_hash() { sha256sum /tls-cert/tls.crt /tls-cert/tls.key; }
+          initial=$(tls_hash)
+          warpgate -c /data/warpgate.yaml run &
+          pid=$!
+          trap 'kill -TERM "$pid" 2>/dev/null || true; wait "$pid" || true; exit 0' TERM INT
+          while kill -0 "$pid" 2>/dev/null; do
+            sleep 30 &
+            wait $! || true
+            current=$(tls_hash) || continue
+            if [ "$current" != "$initial" ]; then
+              kill -TERM "$pid" 2>/dev/null || true
+              wait "$pid" || true
+              exit 0
+            fi
+          done
+          wait "$pid"

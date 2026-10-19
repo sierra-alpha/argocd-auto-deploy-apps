@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: warpgate
+  namespace: argocd
+spec:
+  destination:
+    namespace: warpgate
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: warpgate/manifests
+    repoURL: https://github.com/sierra-alpha/argocd-auto-deploy-apps
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m
