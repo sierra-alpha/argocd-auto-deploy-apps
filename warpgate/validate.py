@@ -52,7 +52,7 @@ def check(d):
     assert ingress['metadata']['namespace']=='warpgate'
     assert ingress['metadata']['annotations']=={
         'traefik.ingress.kubernetes.io/router.middlewares':
-            'traefik-redirecthttps@kubernetescrd,warpgate-warpgate-lan-only@kubernetescrd'
+            'traefik-redirecthttps@kubernetescrd'
     }
     assert ingress['spec']=={
         'ingressClassName':'traefik',
@@ -155,6 +155,12 @@ class Activation(unittest.TestCase):
     def test_reject_stale_active_route(self):
         d=copy.deepcopy(self.docs)
         d['IngressRoute','warpgate-lan']['spec']['routes'][0]['match']='Host(`warpgate.app.sierraalpha.co.nz`)'
+        with self.assertRaises(AssertionError): check(d)
+    def test_reject_reenabled_ip_restriction_on_active_route(self):
+        d=copy.deepcopy(self.docs)
+        d['Ingress','warpgate']['metadata']['annotations'][
+            'traefik.ingress.kubernetes.io/router.middlewares'
+        ]='traefik-redirecthttps@kubernetescrd,warpgate-warpgate-lan-only@kubernetescrd'
         with self.assertRaises(AssertionError): check(d)
     def test_reject_public_lan_allowlist(self):
         d=copy.deepcopy(self.docs)
