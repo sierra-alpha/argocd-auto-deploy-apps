@@ -65,37 +65,60 @@ key separately. The Argo PVC annotations disable automatic pruning/deletion.
 
 ## LAN HTTPS access (alongside Tailscale)
 
-A dedicated Traefik `IngressRoute` now accepts **only HTTPS** on the existing
-`websecure` entrypoint for `warpgate.app.sierraalpha.co.nz`. The original
-Tailscale operator proxy still exposes HTTPS 443 and SSH 2222; no Service
-LoadBalancer/NodePort, public Funnel or router-port-forwarding is introduced.
-Traefik forwards HTTPS to the existing Warpgate port 443 and uses a
-`ServersTransport.serverName` matching the cert-manager certificate hostname
-to **verify** the backend TLS connection. No insecure TLS verification option.
+The web interface now uses the **same `networking.k8s.io/v1` Kubernetes
+`Ingress` and `ingressClassName: traefik` routing pattern as Homepage**.
+It routes `https://warpgate.app.sierraalpha.co.nz` on the existing
+Traefik ingress and references the already provisioned
+`warpgate-tls` cert-manager Secret. Homepage's existing
+`traefik-redirecthttps@kubernetescrd` middleware handles HTTP → HTTPS.
 
-LAN DNS already maps `*.app.sierraalpha.co.nz` to
-`192.168.1.250` in the infrastructure repository's
-`dns-server/dns-server.conf`. When using the LAN resolver, opening
-`https://warpgate.app.sierraalpha.co.nz` should reach the K3s Traefik
-websecure listener. The LAN `Middleware` permits `192.168.1.0/24` only;
-update that CIDR **after review** if your client is in a different VLAN.
-The new NetworkPolicy authorizes traffic to Warpgate's HTTPS pod port
-`8888` only from the `kube-system` Traefik controller pods, leaving SSH
-private to the Tailscale proxy.
+Warpgate, unlike Homepage, terminates **its own HTTPS** on Service port 443.
+The Service's Traefik annotations select HTTPS and reference the
+`warpgate-verified-upstream` ServersTransport to validate its certificate
+using `warpgate.app.sierraalpha.co.nz` as SNI. Do not disable TLS validation
+or redirect Traefik to Warpgate over plaintext port 8888.
 
-**Do not publish this Traefik listener through the WAN or a public reverse
-proxy.** The IP allowlist checks Traefik's observed client IP; a source-NAT
-router, forwarded port, or proxy may hide the true client origin, so the
-allowlist alone is not sufficient proof that this is LAN-only. Preserve
-client source addresses and verify the router has no WAN forward for
-this route. From a device with no Tailscale, test that an external
-connection to this hostname cannot access Warpgate before placing
-privileged credentials behind it.
+The `warpgate-lan-only` middleware preserves the existing `192.168.1.0/24`
+client allowlist (and requires Traefik to receive the real client IP).
+The NetworkPolicy allows `kube-system` Traefik pods to reach Warpgate's
+HTTPS port 8888, while Tailscale proxy pods continue serving HTTPS and SSH
+2222 through the original private Service. **SSH is not exposed by the LAN
+HTTP ingress.** No public ingress or Funnel is added.
 
-On LAN you can use the **web administration UI only**. The LAN ingress does
-not expose raw SSH port `2222`; it remains accessible via the Tailscale
-operator. Don't point a public DNS record at the LAN Traefik proxy merely
-to make access work from a remote network.
+LAN DNS in `salt-setup/dns-server/dns-server.conf` maps
+`*.app.sierraalpha.co.nz` to `192.168.1.250` (rasomniac), the same
+path used by Homepage. On a LAN client, check both names resolve to the
+same ingress address and compare their HTTPS responses:
+
+```sh
+getent ahostsv4 homepage.app.sierraalpha.co.nz
+getent ahostsv4 warpgate.app.sierraalpha.co.nz
+curl -I https://homepage.app.sierraalpha.co.nz
+curl -I https://warpgate.app.sierraalpha.co.nz
+```
+
+If you still see a **default nginx page**, first check that both requests
+resolve to the same address and that ArgoCD synced the new Kubernetes
+Ingress: `kubectl -n warpgate get ingress warpgate`.
+A 403 likely indicates that your real client IP isn't in
+`192.168.1.0/24`, or it is masked by a reverse proxy. A 502 may indicate
+backend HTTPS/SNI issues or NetworkPolicy endpoint labels; inspect Traefik
+and Warpgate logs. Don't widen the IP allowlist or disable TLS
+verification to work around either.
+
+The old `warpgate-lan` **IngressRoute** is retained with a deliberately
+different `.invalid` hostname; ArgoCD's automated `prune: false` would
+otherwise leave its previous live host route in the cluster, conflicting
+with the new Ingress. The inert legacy object can be deleted manually
+after verifying the replacement is healthy; don't enable broad automatic
+pruning because the Warpgate PVC is intended to survive.
+
+**WAN security:** this shares Homepage's existing Traefik listener.
+The ingress is not equivalent to a router firewall; confirm there are no
+WAN forwards, and preserve client source addresses so the allowlist cannot
+be bypassed by source NAT. Use an off-LAN client *without Tailscale* to
+verify Warpgate is not publicly reachable before provisioning high-value
+SSH credentials.
 
 ## Gatus target: configure after login
 

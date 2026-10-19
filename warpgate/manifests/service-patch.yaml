@@ -1,0 +1,9 @@
+# Traefik Kubernetes Ingress reads backend transport settings from the Service.
+# Keep the upstream Helm-rendered manifest untouched and its Tailscale annotations.
+apiVersion: v1
+kind: Service
+metadata:
+  name: warpgate
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: "https"
+    traefik.ingress.kubernetes.io/service.serverstransport: warpgate-warpgate-verified-upstream@kubernetescrd

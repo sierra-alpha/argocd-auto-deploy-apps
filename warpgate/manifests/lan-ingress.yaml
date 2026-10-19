@@ -1,7 +1,33 @@
-# LAN-only HTTPS entrypoint for the Warpgate ADMIN UI.
-# The existing Tailscale Service proxy remains the remote/SSH entrypoint.
-# Traefik must preserve the real client IP for this allowlist to be reliable.
-# Do not forward this ingress's 443 endpoint from the internet.
+# Same standard Kubernetes Ingress pattern used by homepage.
+# Local DNS resolves *.app.sierraalpha.co.nz to the existing Traefik ingress.
+# The existing Tailscale Service proxy remains available for tailnet HTTPS/SSH.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: warpgate
+  namespace: warpgate
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-redirecthttps@kubernetescrd,warpgate-warpgate-lan-only@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: warpgate.app.sierraalpha.co.nz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: warpgate
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - warpgate.app.sierraalpha.co.nz
+      secretName: warpgate-tls
+---
+# Restrict the standard LAN Ingress to the same local subnet as before.
+# Preserve the true client IP in Traefik; source-NAT can bypass source allowlists.
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -12,8 +38,8 @@ spec:
     sourceRange:
       - 192.168.1.0/24
 ---
-# Warpgate already terminates TLS with a cert-manager certificate for this
-# hostname. Verify the upstream certificate using its DNS SAN, not the pod IP.
+# Port 443 on the Warpgate Service terminates TLS in the Warpgate pod.
+# Traefik must use the certificate DNS hostname as SNI, not the pod IP.
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
 metadata:
@@ -22,6 +48,9 @@ metadata:
 spec:
   serverName: warpgate.app.sierraalpha.co.nz
 ---
+# Retirement marker for the old IngressRoute. ArgoCD has automated prune=false,
+# so deleting the former resource from Git would leave an active stale route.
+# Keep the resource with an unrelated hostname until a controlled manual prune.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -32,7 +61,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`warpgate.app.sierraalpha.co.nz`)
+      match: Host(`retired-warpgate-route.invalid`)
       middlewares:
         - name: warpgate-lan-only
       services:

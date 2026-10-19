@@ -38,9 +38,30 @@ def check(d):
         assert main[p]['httpGet']['scheme']=='HTTPS'
     svc=d['Service','warpgate']
     assert svc['spec']['type']=='ClusterIP'
-    assert svc['metadata']['annotations']=={'tailscale.com/expose':'true','tailscale.com/hostname':'warpgate'}
+    assert svc['metadata']['annotations']=={
+        'tailscale.com/expose':'true',
+        'tailscale.com/hostname':'warpgate',
+        'traefik.ingress.kubernetes.io/service.serversscheme':'https',
+        'traefik.ingress.kubernetes.io/service.serverstransport':'warpgate-warpgate-verified-upstream@kubernetescrd',
+    }
     assert {p['port'] for p in svc['spec']['ports']}=={443,2222}
-    assert not any(k in {'Secret','Ingress','HTTPRoute','Job','Role','ClusterRole'} for k,n in d)
+    assert not any(k in {'Secret','HTTPRoute','Job','Role','ClusterRole'} for k,n in d)
+    assert {n for k,n in d if k=='Ingress'}=={'warpgate'}
+    ingress=d['Ingress','warpgate']
+    assert ingress['apiVersion']=='networking.k8s.io/v1'
+    assert ingress['metadata']['namespace']=='warpgate'
+    assert ingress['metadata']['annotations']=={
+        'traefik.ingress.kubernetes.io/router.middlewares':
+            'traefik-redirecthttps@kubernetescrd,warpgate-warpgate-lan-only@kubernetescrd'
+    }
+    assert ingress['spec']=={
+        'ingressClassName':'traefik',
+        'rules':[{'host':'warpgate.app.sierraalpha.co.nz','http':{
+            'paths':[{'path':'/','pathType':'Prefix','backend':{
+                'service':{'name':'warpgate','port':{'number':443}}
+            }}]}}],
+        'tls':[{'hosts':['warpgate.app.sierraalpha.co.nz'],'secretName':'warpgate-tls'}]
+    }
     for name in ('warpgate',):
         assert d['OnePasswordItem',name]['spec']['itemPath']=='vaults/K8s Service Account/items/'+name
     cert=d['Certificate','warpgate']['spec']
@@ -79,11 +100,13 @@ def check(d):
     route=d['IngressRoute','warpgate-lan']
     assert route['apiVersion']=='traefik.io/v1alpha1'
     assert route['metadata']['namespace']=='warpgate'
+    # An old IngressRoute must not compete with the Homepage-style Ingress.
+    # ArgoCD automated prune=false means removing it from git is insufficient.
     assert route['spec']=={
         'entryPoints':['websecure'],
         'routes':[{
             'kind':'Rule',
-            'match':'Host(`warpgate.app.sierraalpha.co.nz`)',
+            'match':'Host(`retired-warpgate-route.invalid`)',
             'middlewares':[{'name':'warpgate-lan-only'}],
             'services':[{'name':'warpgate','port':443,'scheme':'https',
                          'serversTransport':'warpgate-verified-upstream'}]
@@ -120,13 +143,27 @@ class Activation(unittest.TestCase):
     def test_reject_blanket_ingress(self):
         d=copy.deepcopy(self.docs);d['NetworkPolicy','warpgate-tailnet-ingress']['spec']['ingress'][0]['from'][0]['podSelector']={}
         with self.assertRaises((AssertionError,KeyError)): check(d)
+    def test_reject_unscoped_ingress(self):
+        d=copy.deepcopy(self.docs)
+        d['Ingress','warpgate']['spec'].pop('ingressClassName')
+        with self.assertRaises(AssertionError): check(d)
+    def test_reject_missing_https_transport(self):
+        d=copy.deepcopy(self.docs)
+        d['Service','warpgate']['metadata']['annotations'].pop(
+            'traefik.ingress.kubernetes.io/service.serverstransport')
+        with self.assertRaises(AssertionError): check(d)
+    def test_reject_stale_active_route(self):
+        d=copy.deepcopy(self.docs)
+        d['IngressRoute','warpgate-lan']['spec']['routes'][0]['match']='Host(`warpgate.app.sierraalpha.co.nz`)'
+        with self.assertRaises(AssertionError): check(d)
     def test_reject_public_lan_allowlist(self):
         d=copy.deepcopy(self.docs)
         d['Middleware','warpgate-lan-only']['spec']['ipAllowList']['sourceRange']=['0.0.0.0/0']
         with self.assertRaises(AssertionError): check(d)
     def test_reject_lan_plaintext_backend(self):
         d=copy.deepcopy(self.docs)
-        d['IngressRoute','warpgate-lan']['spec']['routes'][0]['services'][0]['scheme']='http'
+        d['Service','warpgate']['metadata']['annotations'][
+            'traefik.ingress.kubernetes.io/service.serversscheme']='http'
         with self.assertRaises(AssertionError): check(d)
     def test_reject_traefik_access_to_ssh(self):
         d=copy.deepcopy(self.docs)
