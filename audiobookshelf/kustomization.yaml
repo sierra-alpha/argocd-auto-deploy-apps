@@ -4,7 +4,7 @@ resources:
   - audiobookshelf.yaml
   - podsort.yaml
 generatorOptions:
-  disableNameSuffixHash: true
+  disableNameSuffixHash: false
 configMapGenerator:
   - name: podsort-code
     namespace: audiobookshelf
