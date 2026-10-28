@@ -153,6 +153,15 @@ spec:
           image: ghcr.io/advplyr/audiobookshelf
           ports:
           - containerPort: 80
+          # Gate Service traffic on the HTTP listener; the existing storage
+          # liveness check remains independent and unchanged.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           livenessProbe:
             exec:
               command:

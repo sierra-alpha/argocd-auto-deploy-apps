@@ -105,6 +105,14 @@ spec:
 
         ports:
         - containerPort: 5002
+        # XTTS model startup can be lengthy; readiness must not restart it.
+        # TCP readiness prevents routing traffic before the listener exists.
+        readinessProbe:
+          tcpSocket:
+            port: 5002
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
         env:
         - name: COQUI_TOS_AGREED
           value: '1'
