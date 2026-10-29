@@ -52,7 +52,10 @@ preferences before applying. Use warning vs critical severity and a bounded
 1. Read-only query the deployed Prometheus API for the metrics above, count
    missing series, inspect Alertmanager route/receivers without copying secrets.
 2. Check existing default kube-prometheus-stack alerts and Gatus/host alert
-   ownership to avoid duplicate Pushover messages.
+   ownership to avoid duplicate Pushover messages. Reuse the shared
+   notification provider/event contract from AI Whisperer control job #80
+   (implementation `sierra-alpha/salt-setup` PR #11); do not create a
+   separate ad-hoc notification provider.
 3. Choose the smallest missing visibility slice (PVC capacity + critical
    workload restart alert), and add a reviewed dashboard/PrometheusRule only
    after verifying the chart's rule label selector.
