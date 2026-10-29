@@ -7,6 +7,9 @@
         icon: audiobookshelf.png
         href: https://audiobookshelf.app.sierraalpha.co.nz
         description: Podcasts, audiobooks & listening
+        namespace: audiobookshelf
+        app: audiobookshelf
+        podSelector: app=audiobookshelf
     - Snapweb:
         icon: snapcast.png
         href: http://mediasomniac.sierraalpha.co.nz:1780
@@ -15,6 +18,9 @@
         icon: mdi-text-to-speech
         href: https://tts-server.app.sierraalpha.co.nz
         description: XTTS voice synthesis service
+        namespace: tts-server
+        app: tts-server
+        podSelector: app=tts-server
     - Home Assistant:
         icon: home-assistant.png
         href: https://haos.app.sierraalpha.co.nz
@@ -57,6 +63,9 @@
         icon: homepage.png
         href: https://homepage.app.sierraalpha.co.nz
         description: Home lab service directory
+        namespace: homepage
+        app: homepage
+        podSelector: app=homepage
 - Automation & GitOps:
     - AI Whisperer:
         icon: github.png
